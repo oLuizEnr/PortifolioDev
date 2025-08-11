@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Configurações - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 fw-bold mb-2">
+                <i class="fas fa-cog me-2"></i>Configurações do Site
+            </h1>
+            <p class="text-muted">Configure as informações do seu portfólio</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-8">
+                        <!-- Site Information -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informações do Site</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.site_title.label(class="form-label") }}
+                                    {{ form.site_title(class="form-control") }}
+                                    {% for error in form.site_title.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.site_description.label(class="form-label") }}
+                                    {{ form.site_description(class="form-control", rows="3") }}
+                                    {% for error in form.site_description.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informações Pessoais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.owner_name.label(class="form-label") }}
+                                            {{ form.owner_name(class="form-control") }}
+                                            {% for error in form.owner_name.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.owner_title.label(class="form-label") }}
+                                            {{ form.owner_title(class="form-control") }}
+                                            {% for error in form.owner_title.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.owner_bio.label(class="form-label") }}
+                                    {{ form.owner_bio(class="form-control", rows="4") }}
+                                    {% for error in form.owner_bio.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.owner_email.label(class="form-label") }}
+                                            {{ form.owner_email(class="form-control") }}
+                                            {% for error in form.owner_email.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.owner_phone.label(class="form-label") }}
+                                            {{ form.owner_phone(class="form-control") }}
+                                            {% for error in form.owner_phone.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.owner_location.label(class="form-label") }}
+                                    {{ form.owner_location(class="form-control") }}
+                                    {% for error in form.owner_location.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Redes Sociais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.linkedin_url.label(class="form-label") }}
+                                            {{ form.linkedin_url(class="form-control") }}
+                                            {% for error in form.linkedin_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.github_url.label(class="form-label") }}
+                                            {{ form.github_url(class="form-control") }}
+                                            {% for error in form.github_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.twitter_url.label(class="form-label") }}
+                                            {{ form.twitter_url(class="form-control") }}
+                                            {% for error in form.twitter_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.instagram_url.label(class="form-label") }}
+                                            {{ form.instagram_url(class="form-control") }}
+                                            {% for error in form.instagram_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEO Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">SEO e Analytics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ form.meta_keywords.label(class="form-label") }}
+                                    {{ form.meta_keywords(class="form-control", rows="2") }}
+                                    {% for error in form.meta_keywords.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">Ex: desenvolvedor, web, frontend, react, javascript</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.google_analytics_id.label(class="form-label") }}
+                                    {{ form.google_analytics_id(class="form-control") }}
+                                    {% for error in form.google_analytics_id.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">Ex: GA-XXXXXXXXX-X ou G-XXXXXXXXXX</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-4">
+                        <!-- Avatar -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Foto de Perfil</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                {% if settings.owner_avatar %}
+                                <img src="{{ url_for('static', filename='uploads/' + settings.owner_avatar) }}" 
+                                     alt="Avatar" class="img-fluid rounded-circle mb-3" 
+                                     style="max-width: 200px; width: 100%;">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 200px; height: 200px;">
+                                    <i class="fas fa-user fa-4x text-white"></i>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mb-3">
+                                    {{ form.owner_avatar.label(class="form-label") }}
+                                    {{ form.owner_avatar(class="form-control") }}
+                                    {% for error in form.owner_avatar.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Ações Rápidas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('portfolio') }}" target="_blank" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>Ver Site
+                                    </a>
+                                    <a href="{{ url_for('admin_project_new') }}" class="btn btn-outline-success">
+                                        <i class="fas fa-plus me-1"></i>Novo Projeto
+                                    </a>
+                                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

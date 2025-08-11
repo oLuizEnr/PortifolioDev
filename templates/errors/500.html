@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Erro Interno - {{ site_settings.site_title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <div class="error-code mb-4">
+                    <i class="fas fa-exclamation-triangle fa-5x text-danger"></i>
+                    <h1 class="display-1 fw-bold text-danger">500</h1>
+                </div>
+                
+                <h2 class="mb-3">Erro Interno do Servidor</h2>
+                <p class="lead text-muted mb-4">
+                    Algo deu errado em nossos servidores. Estamos trabalhando para resolver o problema.
+                </p>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Tente recarregar a página em alguns minutos. Se o problema persistir, entre em contato conosco.
+                </div>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <button onclick="window.location.reload()" class="btn btn-primary">
+                        <i class="fas fa-redo me-2"></i>Tentar Novamente
+                    </button>
+                    
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Voltar ao Início
+                    </a>
+                </div>
+                
+                {% if site_settings.owner_email %}
+                <div class="mt-4">
+                    <p class="text-muted">
+                        Precisa de ajuda? 
+                        <a href="mailto:{{ site_settings.owner_email }}" class="text-decoration-none">
+                            Entre em contato
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-page {
+    padding: 60px 0;
+}
+
+.error-code {
+    position: relative;
+}
+
+.error-code i {
+    opacity: 0.1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.error-code h1 {
+    position: relative;
+    z-index: 1;
+}
+</style>
+{% endblock %}

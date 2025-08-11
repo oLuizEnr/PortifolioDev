@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_projects') }}">Projetos</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-{% if project %}edit{% else %}plus{% endif %} me-2"></i>{{ title }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-8">
+                                <!-- Title -->
+                                <div class="mb-3">
+                                    {{ form.title.label(class="form-label") }}
+                                    {{ form.title(class="form-control") }}
+                                    {% for error in form.title.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    {{ form.description.label(class="form-label") }}
+                                    {{ form.description(class="form-control", rows="3") }}
+                                    {% for error in form.description.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Content -->
+                                <div class="mb-3">
+                                    {{ form.content.label(class="form-label") }}
+                                    {{ form.content(class="form-control", rows="10") }}
+                                    {% for error in form.content.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">Use este campo para descrever detalhadamente o projeto, processo de desenvolvimento, desafios, etc.</div>
+                                </div>
+
+                                <!-- Technologies -->
+                                <div class="mb-3">
+                                    {{ form.technologies.label(class="form-label") }}
+                                    {{ form.technologies(class="form-control") }}
+                                    {% for error in form.technologies.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">Ex: React, Node.js, PostgreSQL, Bootstrap</div>
+                                </div>
+
+                                <!-- URLs -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.demo_url.label(class="form-label") }}
+                                            {{ form.demo_url(class="form-control") }}
+                                            {% for error in form.demo_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            {{ form.github_url.label(class="form-label") }}
+                                            {{ form.github_url(class="form-control") }}
+                                            {% for error in form.github_url.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SEO Fields -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">SEO</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            {{ form.meta_title.label(class="form-label") }}
+                                            {{ form.meta_title(class="form-control") }}
+                                            {% for error in form.meta_title.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                            <div class="form-text">Se vazio, será usado o título do projeto</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            {{ form.meta_description.label(class="form-label") }}
+                                            {{ form.meta_description(class="form-control", rows="2") }}
+                                            {% for error in form.meta_description.errors %}
+                                                <div class="text-danger small">{{ error }}</div>
+                                            {% endfor %}
+                                            <div class="form-text">Se vazio, será usada a descrição resumida</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-4">
+                                <!-- Featured Image -->
+                                <div class="mb-3">
+                                    {{ form.featured_image.label(class="form-label") }}
+                                    {{ form.featured_image(class="form-control") }}
+                                    {% for error in form.featured_image.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    {% if project and project.featured_image %}
+                                    <div class="mt-2">
+                                        <small class="text-muted">Imagem atual:</small><br>
+                                        <img src="{{ url_for('static', filename='uploads/' + project.featured_image) }}" 
+                                             alt="{{ project.title }}" class="img-thumbnail" style="max-width: 200px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Category -->
+                                <div class="mb-3">
+                                    {{ form.category_id.label(class="form-label") }}
+                                    {{ form.category_id(class="form-select") }}
+                                    {% for error in form.category_id.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Tags -->
+                                <div class="mb-3">
+                                    {{ form.tags.label(class="form-label") }}
+                                    {{ form.tags(class="form-control") }}
+                                    {% for error in form.tags.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">Ex: web, frontend, react</div>
+                                </div>
+
+                                <!-- Completion Date -->
+                                <div class="mb-3">
+                                    {{ form.completion_date.label(class="form-label") }}
+                                    {{ form.completion_date(class="form-control") }}
+                                    {% for error in form.completion_date.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Status -->
+                                <div class="mb-3">
+                                    {{ form.status.label(class="form-label") }}
+                                    {{ form.status(class="form-select") }}
+                                    {% for error in form.status.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Featured Project -->
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_featured(class="form-check-input") }}
+                                        {{ form.is_featured.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">Projetos em destaque aparecem na página inicial</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('admin_projects') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Voltar
+                                    </a>
+                                    <div>
+                                        {% if project %}
+                                        <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                            <i class="fas fa-trash me-1"></i>Excluir
+                                        </button>
+                                        {% endif %}
+                                        {{ form.submit(class="btn btn-primary") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+{% if project %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o projeto <strong>{{ project.title }}</strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{{ url_for('admin_project_delete', id=project.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

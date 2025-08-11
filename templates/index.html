@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section py-5" style="margin-top: 76px;">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-md-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    Olá, eu sou {{ site_settings.owner_name or 'Desenvolvedor' }}
+                </h1>
+                <p class="lead mb-4">
+                    {{ site_settings.owner_title or 'Desenvolvedor Full Stack' }}
+                </p>
+                {% if site_settings.owner_bio %}
+                <p class="fs-5 text-muted mb-4">
+                    {{ site_settings.owner_bio }}
+                </p>
+                {% endif %}
+                <div class="hero-buttons">
+                    <a href="{{ url_for('portfolio') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-briefcase me-2"></i>Ver Portfólio
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-user me-2"></i>Sobre Mim
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                {% if site_settings.owner_avatar %}
+                <img src="{{ url_for('static', filename='uploads/' + site_settings.owner_avatar) }}" 
+                     alt="{{ site_settings.owner_name }}" 
+                     class="img-fluid rounded-circle shadow-lg" 
+                     style="max-width: 300px;">
+                {% else %}
+                <div class="avatar-placeholder bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                     style="width: 300px; height: 300px;">
+                    <i class="fas fa-user fa-6x text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects Section -->
+{% if featured_projects %}
+<section class="featured-projects py-5 bg-dark">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">Projetos em Destaque</h2>
+                <p class="lead text-muted">Alguns dos meus trabalhos mais recentes</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for project in featured_projects %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 project-card">
+                    {% if project.featured_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + project.featured_image) }}" 
+                         class="card-img-top" alt="{{ project.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ project.description[:150] }}...</p>
+                        
+                        <div class="project-meta mb-3">
+                            {% if project.category %}
+                            <span class="badge bg-primary me-2">{{ project.category.name }}</span>
+                            {% endif %}
+                            
+                            <div class="project-stats text-muted small">
+                                <span class="me-3">
+                                    <i class="fas fa-heart"></i> {{ project.likes_count or 0 }}
+                                </span>
+                                <span class="me-3">
+                                    <i class="fas fa-comment"></i> {{ project.comments_count or 0 }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-eye"></i> {{ project.views_count or 0 }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ url_for('project_detail', slug=project.slug) }}" 
+                           class="btn btn-outline-primary">
+                            Ver Projeto <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('portfolio') }}" class="btn btn-primary btn-lg">
+                Ver Todos os Projetos <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Achievements Section -->
+{% if featured_achievements %}
+<section class="featured-achievements py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">Conquistas Recentes</h2>
+                <p class="lead text-muted">Certificações e reconhecimentos</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for achievement in featured_achievements %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 achievement-card">
+                    {% if achievement.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + achievement.image) }}" 
+                         class="card-img-top" alt="{{ achievement.title }}" style="height: 150px; object-fit: cover;">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ achievement.title }}</h5>
+                        {% if achievement.organization %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{ achievement.organization }}</h6>
+                        {% endif %}
+                        <p class="card-text">{{ achievement.description[:100] }}...</p>
+                        {% if achievement.date_achieved %}
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i> {{ achievement.date_achieved.strftime('%B %Y') }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if achievement.certificate_url %}
+                    <div class="card-footer">
+                        <a href="{{ achievement.certificate_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-certificate me-1"></i>Ver Certificado
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action Section -->
+<section class="cta-section py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-3">Vamos Trabalhar Juntos?</h2>
+        <p class="lead mb-4">Tenho uma ideia? Entre em contato e vamos transformá-la em realidade!</p>
+        {% if site_settings.owner_email %}
+        <a href="mailto:{{ site_settings.owner_email }}" class="btn btn-light btn-lg">
+            <i class="fas fa-envelope me-2"></i>Entrar em Contato
+        </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, var(--bs-dark) 0%, var(--bs-secondary) 100%);
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
+
+.project-card, .achievement-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    background: var(--bs-body-bg);
+}
+
+.project-card:hover, .achievement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.avatar-placeholder {
+    border: 3px solid var(--bs-border-color);
+}
+
+.cta-section {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+}
+
+.hero-buttons .btn {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        text-align: center;
+    }
+    
+    .hero-buttons .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+</style>
+{% endblock %}

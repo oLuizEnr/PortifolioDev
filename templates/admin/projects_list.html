@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Projetos - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold mb-2">
+                        <i class="fas fa-folder me-2"></i>Gerenciar Projetos
+                    </h1>
+                    <p class="text-muted">Gerencie todos os seus projetos</p>
+                </div>
+                <a href="{{ url_for('admin_project_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Novo Projeto
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if projects.items %}
+    <!-- Projects Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Projeto</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Estatísticas</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects.items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if project.featured_image %}
+                                    <img src="{{ url_for('static', filename='uploads/' + project.featured_image) }}" 
+                                         alt="{{ project.title }}" class="rounded me-3" 
+                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fas fa-image text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-1">{{ project.title }}</h6>
+                                        <small class="text-muted">{{ project.description[:50] }}...</small>
+                                        {% if project.is_featured %}
+                                        <br><span class="badge bg-warning text-dark">Destaque</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if project.category %}
+                                <span class="badge bg-primary">{{ project.category.name }}</span>
+                                {% else %}
+                                <span class="text-muted">Sem categoria</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if project.status == 'published' else 'secondary' }}">
+                                    {{ 'Publicado' if project.status == 'published' else 'Rascunho' }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    <i class="fas fa-heart"></i> {{ project.likes_count or 0 }}
+                                    <i class="fas fa-comment ms-2"></i> {{ project.comments_count or 0 }}
+                                    <i class="fas fa-eye ms-2"></i> {{ project.views_count or 0 }}
+                                </small>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ project.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    {% if project.status == 'published' %}
+                                    <a href="{{ url_for('project_detail', slug=project.slug) }}" 
+                                       target="_blank" class="btn btn-sm btn-outline-primary" title="Ver projeto">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{{ url_for('admin_project_edit', id=project.id) }}" 
+                                       class="btn btn-sm btn-outline-secondary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            title="Excluir" data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal{{ project.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Delete Modal for each project -->
+                        <div class="modal fade" id="deleteModal{{ project.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Tem certeza que deseja excluir o projeto <strong>{{ project.title }}</strong>?</p>
+                                        <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="POST" action="{{ url_for('admin_project_delete', id=project.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-danger">Excluir</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if projects.pages > 1 %}
+    <nav aria-label="Navegação de projetos" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if projects.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin_projects', page=projects.prev_num) }}">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in projects.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != projects.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_projects', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if projects.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin_projects', page=projects.next_num) }}">
+                    Próximo <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+            <h3 class="text-muted mb-3">Nenhum projeto encontrado</h3>
+            <p class="text-muted">Comece criando seu primeiro projeto!</p>
+            <a href="{{ url_for('admin_project_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Criar Primeiro Projeto
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

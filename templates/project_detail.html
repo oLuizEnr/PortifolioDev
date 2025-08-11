@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.meta_title or project.title }} - {{ site_settings.site_title }}{% endblock %}
+{% block description %}{{ project.meta_description or project.description }}{% endblock %}
+{% block keywords %}{{ project.technologies }}, portfolio, projeto{% endblock %}
+
+{% block og_title %}{{ project.title }}{% endblock %}
+{% block og_description %}{{ project.description }}{% endblock %}
+{% block og_image %}
+{% if project.featured_image %}
+<meta property="og:image" content="{{ url_for('static', filename='uploads/' + project.featured_image, _external=True) }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <!-- Project Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Início</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('portfolio') }}">Portfólio</a></li>
+                    <li class="breadcrumb-item active">{{ project.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Project Title and Meta -->
+            <div class="project-header mb-4">
+                <h1 class="display-5 fw-bold mb-3">{{ project.title }}</h1>
+                
+                <div class="project-meta mb-3">
+                    {% if project.category %}
+                    <span class="badge bg-primary me-2">{{ project.category.name }}</span>
+                    {% endif %}
+                    
+                    {% for tag in project.tags %}
+                    <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                
+                <p class="lead text-muted">{{ project.description }}</p>
+                
+                <!-- Project Stats and Actions -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-6">
+                        <div class="project-stats">
+                            <span class="me-3">
+                                <i class="fas fa-heart"></i> {{ project.likes_count or 0 }} curtidas
+                            </span>
+                            <span class="me-3">
+                                <i class="fas fa-comment"></i> {{ project.comments_count or 0 }} comentários
+                            </span>
+                            <span>
+                                <i class="fas fa-eye"></i> {{ project.views_count or 0 }} visualizações
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="project-actions">
+                            <!-- Like Button -->
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-outline-danger me-2" id="likeBtn" 
+                                    data-project-slug="{{ project.slug }}"
+                                    data-liked="{{ 'true' if user_liked else 'false' }}">
+                                <i class="fas fa-heart{% if not user_liked %}-o{% endif %}"></i>
+                                <span id="likeCount">{{ project.likes_count or 0 }}</span>
+                            </button>
+                            {% endif %}
+                            
+                            <!-- Share Button -->
+                            <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#shareModal">
+                                <i class="fas fa-share-alt"></i> Compartilhar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Image -->
+            {% if project.featured_image %}
+            <div class="project-image mb-4">
+                <img src="{{ url_for('static', filename='uploads/' + project.featured_image) }}" 
+                     alt="{{ project.title }}" class="img-fluid rounded shadow">
+            </div>
+            {% endif %}
+
+            <!-- Project Content -->
+            {% if project.content %}
+            <div class="project-content mb-5">
+                <h3 class="mb-3">Detalhes do Projeto</h3>
+                <div class="content-text">
+                    {{ project.content|nl2br|safe }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Project Images Gallery -->
+            {% if project.images %}
+            <div class="project-gallery mb-5">
+                <h3 class="mb-3">Galeria</h3>
+                <div class="row">
+                    {% for image in project.images %}
+                    <div class="col-md-6 mb-3">
+                        <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" 
+                             alt="{{ image.caption or project.title }}" 
+                             class="img-fluid rounded shadow gallery-image" 
+                             data-bs-toggle="modal" data-bs-target="#imageModal"
+                             data-image="{{ url_for('static', filename='uploads/' + image.filename) }}"
+                             data-caption="{{ image.caption or '' }}">
+                        {% if image.caption %}
+                        <small class="text-muted d-block mt-1">{{ image.caption }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <h3 class="mb-4">
+                    Comentários ({{ comments|length }})
+                </h3>
+
+                <!-- Add Comment Form -->
+                {% if current_user.is_authenticated %}
+                <div class="add-comment mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('add_comment', slug=project.slug) }}">
+                                {{ comment_form.hidden_tag() }}
+                                <div class="mb-3">
+                                    {{ comment_form.content.label(class="form-label") }}
+                                    {{ comment_form.content(class="form-control", rows="4") }}
+                                    {% for error in comment_form.content.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {{ comment_form.submit(class="btn btn-primary") }}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <a href="{{ url_for('login') }}">Faça login</a> para deixar um comentário.
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                {% if comments %}
+                <div class="comments-list">
+                    {% for comment in comments %}
+                    <div class="comment mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <div class="comment-avatar me-3">
+                                        {% if comment.user.profile_image %}
+                                        <img src="{{ url_for('static', filename='uploads/' + comment.user.profile_image) }}" 
+                                             alt="{{ comment.user.full_name }}" 
+                                             class="rounded-circle" width="40" height="40">
+                                        {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="comment-content flex-grow-1">
+                                        <div class="comment-header mb-2">
+                                            <strong>{{ comment.user.full_name }}</strong>
+                                            <small class="text-muted ms-2">
+                                                <i class="fas fa-clock"></i>
+                                                {{ moment(comment.created_at).fromNow() }}
+                                            </small>
+                                        </div>
+                                        <div class="comment-text">
+                                            {{ comment.content|nl2br|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-comments fa-3x mb-3"></i>
+                    <p>Seja o primeiro a comentar neste projeto!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="project-sidebar">
+                <!-- Project Info -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informações</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if project.completion_date %}
+                        <div class="info-item mb-3">
+                            <strong>Data de conclusão:</strong><br>
+                            <span class="text-muted">{{ project.completion_date.strftime('%B %Y') }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.technologies %}
+                        <div class="info-item mb-3">
+                            <strong>Tecnologias:</strong><br>
+                            <span class="text-muted">{{ project.technologies }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="info-item">
+                            <strong>Publicado em:</strong><br>
+                            <span class="text-muted">
+                                {{ project.published_at.strftime('%d/%m/%Y') if project.published_at else project.created_at.strftime('%d/%m/%Y') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Links -->
+                {% if project.demo_url or project.github_url %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-link me-2"></i>Links</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if project.demo_url %}
+                        <a href="{{ project.demo_url }}" target="_blank" 
+                           class="btn btn-success btn-sm w-100 mb-2">
+                            <i class="fas fa-external-link-alt me-1"></i>Ver Demonstração
+                        </a>
+                        {% endif %}
+                        
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" target="_blank" 
+                           class="btn btn-dark btn-sm w-100">
+                            <i class="fab fa-github me-1"></i>Ver Código
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Related Projects -->
+                {% if related_projects %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Projetos Relacionados</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for related in related_projects %}
+                        <div class="related-project mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                            <h6 class="mb-1">
+                                <a href="{{ url_for('project_detail', slug=related.slug) }}" 
+                                   class="text-decoration-none">
+                                    {{ related.title }}
+                                </a>
+                            </h6>
+                            <p class="text-muted small mb-0">{{ related.description[:80] }}...</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Compartilhar Projeto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <a href="{{ linkedin_share_url }}" target="_blank" 
+                           class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <small>LinkedIn</small>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-info btn-lg w-100 mb-2" onclick="shareTwitter()">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <small>Twitter</small>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-success btn-lg w-100 mb-2" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <small>Copiar Link</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="shareUrl" 
+                           value="{{ request.url }}" readonly>
+                    <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle">{{ project.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="" class="img-fluid">
+                <p id="modalCaption" class="text-muted mt-2"></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.project-header {
+    border-bottom: 1px solid var(--bs-border-color);
+    padding-bottom: 20px;
+}
+
+.project-stats span {
+    color: var(--bs-text-muted);
+}
+
+.gallery-image {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.gallery-image:hover {
+    transform: scale(1.05);
+}
+
+.comment {
+    border-left: 3px solid var(--bs-primary);
+    padding-left: 15px;
+}
+
+.related-project:last-child {
+    border-bottom: none !important;
+}
+
+.info-item strong {
+    color: var(--bs-text-color);
+}
+
+@media (max-width: 768px) {
+    .project-actions {
+        text-align: center !important;
+        margin-top: 15px;
+    }
+    
+    .project-stats {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Like functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const likeBtn = document.getElementById('likeBtn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function() {
+            const slug = this.dataset.projectSlug;
+            const isLiked = this.dataset.liked === 'true';
+            
+            fetch(`/project/${slug}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const icon = this.querySelector('i');
+                const count = document.getElementById('likeCount');
+                
+                if (data.liked) {
+                    icon.className = 'fas fa-heart';
+                    this.dataset.liked = 'true';
+                } else {
+                    icon.className = 'far fa-heart';
+                    this.dataset.liked = 'false';
+                }
+                
+                count.textContent = data.likes_count;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+});
+
+// Share functions
+function shareTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`Confira este projeto: {{ project.title }}`);
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+}
+
+function copyToClipboard() {
+    const shareUrl = document.getElementById('shareUrl');
+    shareUrl.select();
+    shareUrl.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(shareUrl.value).then(function() {
+        // Show feedback
+        const btn = event.target.closest('button');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+            btn.innerHTML = original;
+        }, 1000);
+    });
+}
+
+// Image modal
+document.addEventListener('DOMContentLoaded', function() {
+    const galleryImages = document.querySelectorAll('.gallery-image');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    galleryImages.forEach(img => {
+        img.addEventListener('click', function() {
+            modalImage.src = this.dataset.image;
+            modalImage.alt = this.alt;
+            modalCaption.textContent = this.dataset.caption;
+        });
+    });
+});
+</script>
+{% endblock %}

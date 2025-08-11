@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil - {{ site_settings.site_title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row">
+        <!-- Profile Info -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if current_user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" 
+                         alt="{{ current_user.full_name }}" 
+                         class="img-fluid rounded-circle mb-3" 
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                         style="width: 150px; height: 150px;">
+                        <i class="fas fa-user fa-4x text-white"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <h4 class="card-title">{{ current_user.full_name }}</h4>
+                    <p class="text-muted">@{{ current_user.username }}</p>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                    
+                    {% if current_user.bio %}
+                    <p class="card-text">{{ current_user.bio }}</p>
+                    {% endif %}
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                            <i class="fas fa-edit me-1"></i>Editar Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Info -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações da Conta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Membro desde:</strong><br>
+                        <small class="text-muted">{{ current_user.created_at.strftime('%d de %B de %Y') }}</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Último acesso:</strong><br>
+                        <small class="text-muted">{{ current_user.updated_at.strftime('%d/%m/%Y às %H:%M') }}</small>
+                    </div>
+                    
+                    {% if current_user.is_owner %}
+                    <div class="mb-3">
+                        <span class="badge bg-success">
+                            <i class="fas fa-crown me-1"></i>Proprietário do Portfólio
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Atividade Recente</h5>
+                </div>
+                <div class="card-body">
+                    <!-- User Comments -->
+                    {% if current_user.comments %}
+                    <h6 class="mb-3">Meus Comentários</h6>
+                    {% for comment in current_user.comments[:5] %}
+                    <div class="mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <a href="{{ url_for('project_detail', slug=comment.project.slug) }}" 
+                                       class="text-decoration-none">
+                                        {{ comment.project.title }}
+                                    </a>
+                                </h6>
+                                <p class="mb-1">{{ comment.content[:100] }}{% if comment.content|length > 100 %}...{% endif %}</p>
+                            </div>
+                            <small class="text-muted">
+                                {{ comment.created_at.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if current_user.comments|length > 5 %}
+                    <p class="text-muted">E mais {{ current_user.comments|length - 5 }} comentário(s)...</p>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comment fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Nenhum comentário ainda</h5>
+                        <p class="text-muted">Explore os projetos e deixe seus comentários!</p>
+                        <a href="{{ url_for('portfolio') }}" class="btn btn-primary">
+                            Ver Projetos
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Liked Projects -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Projetos Curtidos</h5>
+                </div>
+                <div class="card-body">
+                    {% if current_user.likes %}
+                    <div class="row">
+                        {% for like in current_user.likes[:6] %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <a href="{{ url_for('project_detail', slug=like.project.slug) }}" 
+                                           class="text-decoration-none">
+                                            {{ like.project.title }}
+                                        </a>
+                                    </h6>
+                                    <p class="card-text small text-muted">
+                                        {{ like.project.description[:80] }}...
+                                    </p>
+                                    <small class="text-muted">
+                                        Curtido em {{ like.created_at.strftime('%d/%m/%Y') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if current_user.likes|length > 6 %}
+                    <p class="text-muted">E mais {{ current_user.likes|length - 6 }} projeto(s) curtido(s)...</p>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Nenhuma curtida ainda</h5>
+                        <p class="text-muted">Curta os projetos que você achar interessantes!</p>
+                        <a href="{{ url_for('portfolio') }}" class="btn btn-primary">
+                            Ver Projetos
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-sm .card-body {
+    padding: 0.75rem;
+}
+
+.img-fluid.rounded-circle {
+    border: 3px solid var(--bs-border-color);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Página Não Encontrada - {{ site_settings.site_title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <div class="error-code mb-4">
+                    <i class="fas fa-search fa-5x text-primary"></i>
+                    <h1 class="display-1 fw-bold text-primary">404</h1>
+                </div>
+                
+                <h2 class="mb-3">Página Não Encontrada</h2>
+                <p class="lead text-muted mb-4">
+                    A página que você está procurando não existe ou foi movida.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Voltar ao Início
+                    </a>
+                    
+                    <a href="{{ url_for('portfolio') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-briefcase me-2"></i>Ver Portfólio
+                    </a>
+                </div>
+                
+                <!-- Popular pages -->
+                <div class="mt-5">
+                    <h5 class="mb-3">Páginas Populares</h5>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-home me-2"></i>Página Inicial
+                        </a>
+                        <a href="{{ url_for('portfolio') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-briefcase me-2"></i>Portfólio
+                        </a>
+                        <a href="{{ url_for('about') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i>Sobre
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-page {
+    padding: 60px 0;
+}
+
+.error-code {
+    position: relative;
+}
+
+.error-code i {
+    opacity: 0.1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.error-code h1 {
+    position: relative;
+    z-index: 1;
+}
+
+.list-group-item {
+    border: none;
+    background: transparent;
+}
+
+.list-group-item:hover {
+    background: var(--bs-secondary-bg);
+}
+</style>
+{% endblock %}

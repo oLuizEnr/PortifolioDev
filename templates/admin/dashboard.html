@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold mb-3">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </h1>
+            <p class="lead text-muted">Visão geral do seu portfólio</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ total_projects }}</h4>
+                            <p class="mb-0">Total de Projetos</p>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ published_projects }}</h4>
+                            <p class="mb-0">Projetos Publicados</p>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ total_likes }}</h4>
+                            <p class="mb-0">Total de Curtidas</p>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ total_comments }}</h4>
+                            <p class="mb-0">Total de Comentários</p>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Projects -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-folder me-2"></i>Projetos Recentes
+                    </h5>
+                    <a href="{{ url_for('admin_project_new') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>Novo Projeto
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_projects %}
+                        {% for project in recent_projects %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                            <div>
+                                <h6 class="mb-1">
+                                    <a href="{{ url_for('admin_project_edit', id=project.id) }}" 
+                                       class="text-decoration-none">
+                                        {{ project.title }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    {{ project.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+                            <div>
+                                <span class="badge bg-{{ 'success' if project.status == 'published' else 'secondary' }}">
+                                    {{ 'Publicado' if project.status == 'published' else 'Rascunho' }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="text-center">
+                            <a href="{{ url_for('admin_projects') }}" class="btn btn-outline-primary btn-sm">
+                                Ver Todos os Projetos
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-folder-open fa-2x mb-2"></i>
+                            <p class="mb-0">Nenhum projeto encontrado</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Comments -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comment me-2"></i>Comentários Recentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_comments %}
+                        {% for comment in recent_comments %}
+                        <div class="d-flex align-items-start mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="me-3">
+                                {% if comment.user.profile_image %}
+                                <img src="{{ url_for('static', filename='uploads/' + comment.user.profile_image) }}" 
+                                     alt="{{ comment.user.full_name }}" 
+                                     class="rounded-circle" width="30" height="30">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 30px; height: 30px;">
+                                    <i class="fas fa-user text-white small"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ comment.user.full_name }}</h6>
+                                        <small class="text-muted">
+                                            em <a href="{{ url_for('project_detail', slug=comment.project.slug) }}" 
+                                                  class="text-decoration-none">{{ comment.project.title }}</a>
+                                        </small>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ comment.created_at.strftime('%d/%m') }}
+                                    </small>
+                                </div>
+                                <p class="mb-0 small">{{ comment.content[:80] }}...</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-comments fa-2x mb-2"></i>
+                            <p class="mb-0">Nenhum comentário encontrado</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_project_new') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-plus me-2"></i>Novo Projeto
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_category_new') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-tag me-2"></i>Nova Categoria
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_settings') }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-cog me-2"></i>Configurações
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('portfolio') }}" class="btn btn-outline-secondary w-100" target="_blank">
+                                <i class="fas fa-eye me-2"></i>Ver Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

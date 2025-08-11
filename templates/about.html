@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Sobre - {{ site_settings.site_title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3">
+                Sobre {{ site_settings.owner_name or 'Mim' }}
+            </h1>
+            {% if site_settings.owner_title %}
+            <p class="lead text-muted">{{ site_settings.owner_title }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <!-- Avatar and Basic Info -->
+        <div class="col-md-4 text-center mb-4">
+            {% if site_settings.owner_avatar %}
+            <img src="{{ url_for('static', filename='uploads/' + site_settings.owner_avatar) }}" 
+                 alt="{{ site_settings.owner_name }}" 
+                 class="img-fluid rounded-circle shadow-lg mb-3" 
+                 style="max-width: 300px;">
+            {% else %}
+            <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center shadow-lg" 
+                 style="width: 300px; height: 300px;">
+                <i class="fas fa-user fa-6x text-white"></i>
+            </div>
+            {% endif %}
+            
+            <!-- Contact Info -->
+            {% if site_settings.owner_location %}
+            <p class="text-muted mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>{{ site_settings.owner_location }}
+            </p>
+            {% endif %}
+            
+            {% if site_settings.owner_email %}
+            <p class="mb-2">
+                <a href="mailto:{{ site_settings.owner_email }}" class="text-decoration-none">
+                    <i class="fas fa-envelope me-2"></i>{{ site_settings.owner_email }}
+                </a>
+            </p>
+            {% endif %}
+            
+            {% if site_settings.owner_phone %}
+            <p class="mb-3">
+                <i class="fas fa-phone me-2"></i>{{ site_settings.owner_phone }}
+            </p>
+            {% endif %}
+            
+            <!-- Social Links -->
+            <div class="social-links">
+                {% if site_settings.linkedin_url %}
+                <a href="{{ site_settings.linkedin_url }}" target="_blank" 
+                   class="btn btn-outline-primary me-2 mb-2">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+                {% endif %}
+                
+                {% if site_settings.github_url %}
+                <a href="{{ site_settings.github_url }}" target="_blank" 
+                   class="btn btn-outline-dark me-2 mb-2">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                {% endif %}
+                
+                {% if site_settings.twitter_url %}
+                <a href="{{ site_settings.twitter_url }}" target="_blank" 
+                   class="btn btn-outline-info me-2 mb-2">
+                    <i class="fab fa-twitter"></i> Twitter
+                </a>
+                {% endif %}
+                
+                {% if site_settings.instagram_url %}
+                <a href="{{ site_settings.instagram_url }}" target="_blank" 
+                   class="btn btn-outline-danger me-2 mb-2">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Bio and Description -->
+        <div class="col-md-8">
+            {% if site_settings.owner_bio %}
+            <div class="about-content">
+                <h3 class="mb-3">Minha História</h3>
+                <div class="fs-5 lh-lg">
+                    {{ site_settings.owner_bio|nl2br|safe }}
+                </div>
+            </div>
+            {% else %}
+            <div class="about-content text-center py-5">
+                <i class="fas fa-user-edit fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Biografia em breve...</h4>
+                <p class="text-muted">Esta seção será preenchida com mais informações pessoais.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Skills/Technologies Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-code me-2"></i>Tecnologias e Habilidades
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <h5>Frontend</h5>
+                            <div class="skill-tags">
+                                <span class="badge bg-primary me-2 mb-2">HTML5</span>
+                                <span class="badge bg-primary me-2 mb-2">CSS3</span>
+                                <span class="badge bg-primary me-2 mb-2">JavaScript</span>
+                                <span class="badge bg-primary me-2 mb-2">React</span>
+                                <span class="badge bg-primary me-2 mb-2">Bootstrap</span>
+                                <span class="badge bg-primary me-2 mb-2">Responsive Design</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5>Backend</h5>
+                            <div class="skill-tags">
+                                <span class="badge bg-success me-2 mb-2">Python</span>
+                                <span class="badge bg-success me-2 mb-2">Flask</span>
+                                <span class="badge bg-success me-2 mb-2">Django</span>
+                                <span class="badge bg-success me-2 mb-2">Node.js</span>
+                                <span class="badge bg-success me-2 mb-2">Express</span>
+                                <span class="badge bg-success me-2 mb-2">APIs REST</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5>Ferramentas</h5>
+                            <div class="skill-tags">
+                                <span class="badge bg-secondary me-2 mb-2">Git</span>
+                                <span class="badge bg-secondary me-2 mb-2">PostgreSQL</span>
+                                <span class="badge bg-secondary me-2 mb-2">MongoDB</span>
+                                <span class="badge bg-secondary me-2 mb-2">Docker</span>
+                                <span class="badge bg-secondary me-2 mb-2">AWS</span>
+                                <span class="badge bg-secondary me-2 mb-2">VS Code</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Timeline -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-briefcase me-2"></i>Experiência Profissional
+            </h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h5>Desenvolvedor Full Stack</h5>
+                        <h6 class="text-muted">Empresa Atual • 2023 - Presente</h6>
+                        <p>Desenvolvimento de aplicações web modernas utilizando React, Node.js e PostgreSQL. Responsável por toda a stack tecnológica, desde o frontend até o deploy em produção.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h5>Desenvolvedor Frontend</h5>
+                        <h6 class="text-muted">Empresa Anterior • 2021 - 2023</h6>
+                        <p>Criação de interfaces de usuário responsivas e interativas. Colaboração próxima com designers e equipe de UX para entregar experiências excepcionais.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h5>Estudante de Programação</h5>
+                        <h6 class="text-muted">Autodidata • 2020 - 2021</h6>
+                        <p>Período intenso de aprendizado e desenvolvimento de projetos pessoais. Foco em JavaScript, Python e desenvolvimento web.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center py-5">
+                    <h2 class="card-title mb-3">Vamos Trabalhar Juntos?</h2>
+                    <p class="card-text fs-5 mb-4">
+                        Estou sempre interessado em novos projetos e oportunidades de colaboração.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        {% if site_settings.owner_email %}
+                        <a href="mailto:{{ site_settings.owner_email }}" 
+                           class="btn btn-light btn-lg">
+                            <i class="fas fa-envelope me-2"></i>Enviar Email
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('portfolio') }}" 
+                           class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-briefcase me-2"></i>Ver Portfólio
+                        </a>
+                        
+                        {% if site_settings.linkedin_url %}
+                        <a href="{{ site_settings.linkedin_url }}" target="_blank" 
+                           class="btn btn-outline-light btn-lg">
+                            <i class="fab fa-linkedin me-2"></i>LinkedIn
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--bs-primary);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    background: var(--bs-primary);
+    border-radius: 50%;
+    border: 3px solid var(--bs-body-bg);
+}
+
+.timeline-content {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-left: 20px;
+}
+
+.skill-tags .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.social-links .btn {
+    border-radius: 25px;
+}
+
+@media (max-width: 768px) {
+    .timeline {
+        padding-left: 15px;
+    }
+    
+    .timeline-content {
+        margin-left: 10px;
+    }
+    
+    .timeline-marker {
+        left: -12px;
+    }
+    
+    .social-links .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+{% endblock %}
