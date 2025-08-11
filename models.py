@@ -21,6 +21,10 @@ class User(UserMixin, db.Model):
     @property
     def is_active(self):
         return self.active
+    
+    @is_active.setter
+    def is_active(self, value):
+        self.active = value
     email_verified = db.Column(db.Boolean, default=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expires = db.Column(db.DateTime, nullable=True)
