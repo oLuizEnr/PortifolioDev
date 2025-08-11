@@ -1,0 +1,84 @@
+Objetivo:
+Desenvolver um sistema web de portfólio digital interativo para um único proprietário (usuário principal), onde ele possa cadastrar, organizar e gerenciar projetos, conquistas e experiências.
+Visitantes poderão visualizar, curtir, comentar (com login) e compartilhar publicações no LinkedIn.
+O desenvolvimento deverá ser feito com auxílio da IA do Replit (Ghostwriter) para gerar, refinar e corrigir código, podendo usar outras IAs (ChatGPT, Copilot, Gemini etc.) para design, organização e documentação.
+
+Requisitos Funcionais
+
+1. Área Administrativa (Proprietário do Portfólio)
+
+Cadastrar, editar e excluir conquistas e projetos.
+
+Upload de imagens, vídeos ou links de demonstração.
+
+Organização por categorias ou tags.
+
+Opção de publicar ou deixar como rascunho.
+
+2. Área Pública (Visitantes)
+
+Visualizar projetos e conquistas.
+
+Botão de curtir + contador de curtidas.
+
+Campo para comentários (somente para usuários logados).
+
+Botão para compartilhar no LinkedIn com prévia personalizada e link direto para o projeto.
+
+3. Área de Autenticação
+
+Cadastro e login de visitantes (nome, e-mail e senha).
+
+Recuperação de senha.
+
+Perfis com foto e informações básicas.
+
+4. Funcionalidades Extras
+
+Sistema de notificação ao proprietário quando um comentário é feito.
+
+Seção “Sobre Mim” para apresentação pessoal.
+
+Página inicial com destaques (últimos ou mais curtidos).
+
+Requisitos Não Funcionais
+
+Interface responsiva (desktop, tablet, celular).
+
+Código limpo, comentado e documentado.
+
+Estrutura organizada por pastas (frontend, backend, assets, docs).
+
+Todo o processo de criação deve ser documentado (prompt inicial, código gerado, ajustes feitos).
+
+Tecnologias Sugeridas
+
+Frontend: HTML, CSS, JavaScript (React ou Next.js).
+
+Backend: Node.js com Express OU Python com Flask/Django.
+
+Banco de Dados: MongoDB ou PostgreSQL.
+
+Integrações: API do LinkedIn para compartilhamento.
+
+Instruções para a IA
+
+Criar a estrutura completa do projeto (frontend + backend + banco de dados).
+
+Implementar todas as funcionalidades descritas.
+
+Gerar código funcional e comentado.
+
+Sugerir melhorias de UI/UX e implementar tema responsivo.
+
+Explicar passo a passo de deploy (ex.: Vercel, Netlify, Railway).
+
+Documentar o processo: prompt usado, código gerado, ajustes manuais.
+
+Extra
+
+Implementar dark mode no frontend.
+
+Adicionar SEO básico (meta tags dinâmicas).
+
+Criar seed inicial com projetos fictícios para testes.
