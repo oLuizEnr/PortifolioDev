@@ -21,9 +21,12 @@ import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations - mandatory for Replit Auth
+  // User operations - local auth
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(userData: UpsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  initializeDefaultUser(): Promise<void>;
 
   // Project operations
   getProjects(): Promise<Project[]>;
@@ -64,12 +67,22 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(userData).returning();
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
-        target: users.id,
+        target: users.email,
         set: {
           ...userData,
           updatedAt: new Date(),
@@ -77,6 +90,19 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async initializeDefaultUser(): Promise<void> {
+    const existingUser = await this.getUserByEmail("teste@teste");
+    if (!existingUser) {
+      await this.createUser({
+        email: "teste@teste",
+        password: "01234567",
+        firstName: "Luiz",
+        lastName: "Enrique",
+        isAdmin: true,
+      });
+    }
   }
 
   async getProjects(): Promise<Project[]> {

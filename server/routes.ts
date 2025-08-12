@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { insertProjectSchema, insertExperienceSchema, insertAchievementSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
@@ -31,11 +31,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
+  app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    try {
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      req.session!.userId = user.id;
+      res.json({ message: "Login successful", user: { ...user, password: undefined } });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post('/api/logout', (req, res) => {
+    req.session?.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logout successful" });
+    });
+  });
+
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      res.json({ ...req.user, password: undefined });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -246,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/comments', isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id;
       const data = insertCommentSchema.parse({ ...req.body, userId });
       const comment = await storage.createComment(data);
       res.json(comment);
@@ -262,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Likes routes
   app.post('/api/likes', isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id;
       const { itemType, itemId } = req.body;
       
       if (!itemType || !itemId) {
@@ -283,8 +307,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const count = await storage.getLikeCount(itemType, itemId);
       
       let userLiked = false;
-      if (req.user?.claims?.sub) {
-        const userLike = await storage.getUserLike(req.user.claims.sub, itemType, itemId);
+      if (req.user?.id) {
+        const userLike = await storage.getUserLike(req.user.id, itemType, itemId);
         userLiked = !!userLike;
       }
 

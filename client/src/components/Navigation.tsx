@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface NavigationProps {
   onLogin?: () => void;
@@ -13,9 +16,15 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
-  };
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/logout", "POST");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      window.location.href = "/";
+    },
+  });
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -81,19 +90,14 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
           <div className="hidden md:flex items-center space-x-4">
             {!isAuthenticated ? (
               <div className="flex items-center space-x-3">
-                <Button 
-                  variant="ghost"
-                  onClick={onLogin}
-                  data-testid="button-login"
-                >
-                  Entrar
-                </Button>
-                <Button 
-                  onClick={() => window.location.href = "/api/login"}
-                  data-testid="button-signup"
-                >
-                  Cadastrar
-                </Button>
+                <Link href="/login">
+                  <Button 
+                    variant="ghost"
+                    data-testid="button-login"
+                  >
+                    Admin
+                  </Button>
+                </Link>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
@@ -114,7 +118,8 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={handleLogout}
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
                     data-testid="button-logout"
                   >
                     <LogOut className="w-4 h-4" />
@@ -181,26 +186,16 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
             
             <div className="border-t border-slate-200 pt-3 mt-3">
               {!isAuthenticated ? (
-                <>
+                <Link href="/login">
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start mb-2"
-                    onClick={() => {
-                      onLogin?.();
-                      setIsMobileMenuOpen(false);
-                    }}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     data-testid="mobile-button-login"
                   >
-                    Entrar
+                    Admin
                   </Button>
-                  <Button 
-                    className="w-full"
-                    onClick={() => window.location.href = "/api/login"}
-                    data-testid="mobile-button-signup"
-                  >
-                    Cadastrar
-                  </Button>
-                </>
+                </Link>
               ) : (
                 <div className="space-y-2">
                   {user?.isAdmin && (
@@ -220,7 +215,7 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
-                    onClick={handleLogout}
+                    onClick={() => logoutMutation.mutate()}
                     data-testid="mobile-button-logout"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
