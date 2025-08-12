@@ -1,0 +1,94 @@
+Você é um assistente de desenvolvimento no Replit AI.
+Sua tarefa é criar um portfólio digital interativo com as seguintes características, usando código limpo, comentado e documentado.
+
+Objetivo
+Entregar um sistema funcional, seguro, responsivo e pronto para deploy, com:
+
+Área administrativa para o proprietário.
+
+Área pública para visitantes.
+
+Integração social com curtidas, comentários e compartilhamento no LinkedIn (API oficial).
+
+Funcionalidades
+Área Administrativa (Proprietário)
+
+Login seguro (JWT ou sessões).
+
+CRUD para projetos, conquistas e experiências.
+
+Upload de imagens, vídeos ou links.
+
+Organização por categorias/tags.
+
+Marcar itens como publicado ou rascunho.
+
+Área Pública (Visitantes)
+
+Visualizar projetos, conquistas e experiências.
+
+Curtir com contador.
+
+Comentar (apenas logados).
+
+Compartilhar no LinkedIn (API oficial, prévia personalizada).
+
+Autenticação de Visitantes
+
+Cadastro (nome, e-mail, senha).
+
+Login e recuperação de senha.
+
+Perfil com foto e dados básicos.
+
+Extras
+
+Notificação ao proprietário para novos comentários.
+
+Página “Sobre Mim”.
+
+Página inicial com destaques (últimos ou mais curtidos).
+
+Regras de Desenvolvimento
+Código base gerado com Replit AI.
+
+Documentar prompts, código gerado e alterações.
+
+Interface responsiva para desktop, tablet e celular.
+
+Design moderno com Tailwind CSS ou similar.
+
+Tecnologias
+Frontend: React ou Next.js.
+
+Backend: Node.js + Express ou Python + Flask/Django.
+
+Banco de Dados: MongoDB ou PostgreSQL.
+
+Integração: API oficial do LinkedIn.
+
+Instruções para Implementação
+Criar estrutura de pastas para front-end e back-end.
+
+Front-end:
+
+Páginas: Home, Sobre Mim, Projetos, Conquistas, Experiências, Login, Cadastro, Painel Administrativo.
+
+Back-end:
+
+CRUD completo para projetos, conquistas e experiências.
+
+Autenticação segura.
+
+Integração com banco de dados escolhido.
+
+Integração com API do LinkedIn.
+
+Garantir responsividade e design moderno.
+
+Comentar código e gerar documentação resumida.
+
+Criar dados de exemplo (seed) com 3 projetos fictícios.
+
+Entrega Final
+Um portfólio digital interativo funcional, seguro, responsivo e moderno, pronto para deploy, com integração social e documentação.
