@@ -71,6 +71,13 @@ def create_app():
         from datetime import datetime, timezone
         return {'current_year': datetime.now(timezone.utc).year}
     
+    @app.template_filter('nl2br')
+    def nl2br_filter(text):
+        """Convert newlines to <br> tags"""
+        if text:
+            return text.replace('\n', '<br>')
+        return text
+    
     # Create upload directory
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
