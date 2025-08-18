@@ -50,7 +50,7 @@ class ProjectForm(FlaskForm):
     title = StringField('Título', validators=[DataRequired(), Length(min=3, max=200)])
     description = TextAreaField('Descrição resumida', validators=[DataRequired(), Length(min=10, max=500)])
     content = TextAreaField('Conteúdo detalhado', validators=[Optional()], widget=TextArea())
-    category_id = SelectField('Categoria', coerce=int, validators=[Optional()])
+    category_id = SelectField('Categoria', coerce=lambda x: int(x) if x and x.isdigit() else None, validators=[Optional()])
     tags = StringField('Tags (separadas por vírgula)', validators=[Optional()])
     featured_image = FileField('Imagem principal', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Apenas imagens são permitidas!')])
     demo_url = URLField('URL da demonstração', validators=[Optional(), URL()])
@@ -65,7 +65,7 @@ class ProjectForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
-        self.category_id.choices = [('', 'Selecione uma categoria')] + [(str(c.id), c.name) for c in Category.query.all()]
+        self.category_id.choices = [('', 'Selecione uma categoria')] + [(c.id, c.name) for c in Category.query.all()]
 
 class AchievementForm(FlaskForm):
     title = StringField('Título', validators=[DataRequired(), Length(min=3, max=200)])

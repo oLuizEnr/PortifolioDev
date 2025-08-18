@@ -555,6 +555,57 @@ def admin_category_new():
     
     return render_template('admin/category_form.html', form=form, title='Nova Categoria')
 
+@app.route('/admin/category/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def admin_category_edit(id):
+    """Edit category"""
+    if not current_user.is_owner:
+        abort(403)
+    
+    category = Category.query.get_or_404(id)
+    form = CategoryForm()
+    
+    if form.validate_on_submit():
+        # Check if name changed and update slug if necessary
+        if category.name != form.name.data:
+            slug = create_slug(form.name.data)
+            slug = make_unique_slug(Category, 'slug', slug, exclude_id=category.id)
+            category.slug = slug
+        
+        category.name = form.name.data
+        category.description = form.description.data
+        
+        db.session.commit()
+        
+        flash('Categoria atualizada com sucesso!', 'success')
+        return redirect(url_for('admin_categories'))
+    
+    elif request.method == 'GET':
+        form.name.data = category.name
+        form.description.data = category.description
+    
+    return render_template('admin/category_form.html', form=form, category=category, title='Editar Categoria')
+
+@app.route('/admin/category/<int:id>/delete', methods=['POST'])
+@login_required
+def admin_category_delete(id):
+    """Delete category"""
+    if not current_user.is_owner:
+        abort(403)
+    
+    category = Category.query.get_or_404(id)
+    
+    # Check if category has projects
+    if category.projects:
+        flash('Não é possível excluir uma categoria que possui projetos associados.', 'error')
+        return redirect(url_for('admin_categories'))
+    
+    db.session.delete(category)
+    db.session.commit()
+    
+    flash('Categoria excluída com sucesso!', 'success')
+    return redirect(url_for('admin_categories'))
+
 # Site settings
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
