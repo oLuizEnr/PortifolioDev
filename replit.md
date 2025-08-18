@@ -6,6 +6,12 @@ This is a comprehensive digital portfolio web application built with Flask for s
 
 Preferred communication style: Simple, everyday language.
 
+# Admin Credentials
+
+Portfolio Owner: Luiz Enrique
+- Username: luiz@teste
+- Password: Admin123!
+
 # System Architecture
 
 ## Backend Architecture
