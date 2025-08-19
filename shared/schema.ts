@@ -2,108 +2,122 @@ import { sql } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 import {
   index,
-  jsonb,
-  pgTable,
-  timestamp,
-  varchar,
-  text,
+  text as sqliteText,
+  sqliteTable,
   integer,
-  boolean,
-} from "drizzle-orm/pg-core";
+  text,
+  blob,
+} from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table - mandatory for Replit Auth
-export const sessions = pgTable(
+// Session storage table
+export const sessions = sqliteTable(
   "sessions",
   {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
+    sid: text("sid").primaryKey(),
+    sess: text("sess", { mode: "json" }).notNull(),
+    expire: integer("expire", { mode: "timestamp" }).notNull(),
   },
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
 // User storage table - local authentication
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique().notNull(),
-  password: varchar("password").notNull(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  isAdmin: boolean("is_admin").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text("email").unique().notNull(),
+  password: text("password").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  profileImageUrl: text("profile_image_url"),
+  linkedinUrl: text("linkedin_url"),
+  isAdmin: integer("is_admin", { mode: "boolean" }).default(false),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Projects table
-export const projects = pgTable("projects", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  title: varchar("title", { length: 255 }).notNull(),
+export const projects = sqliteTable("projects", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
   description: text("description").notNull(),
-  imageUrl: varchar("image_url"),
-  githubUrl: varchar("github_url"),
-  liveUrl: varchar("live_url"),
-  technologies: text("technologies").array(),
-  featured: boolean("featured").default(false),
-  published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  imageUrl: text("image_url"),
+  githubUrl: text("github_url"),
+  liveUrl: text("live_url"),
+  technologies: text("technologies", { mode: "json" }).$type<string[]>(),
+  featured: integer("featured", { mode: "boolean" }).default(false),
+  published: integer("published", { mode: "boolean" }).default(false),
+  linkedinPost: text("linkedin_post"),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Experience table
-export const experiences = pgTable("experiences", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  position: varchar("position", { length: 255 }).notNull(),
-  company: varchar("company", { length: 255 }).notNull(),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date"),
+export const experiences = sqliteTable("experiences", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  position: text("position").notNull(),
+  company: text("company").notNull(),
+  startDate: integer("start_date", { mode: "timestamp" }).notNull(),
+  endDate: integer("end_date", { mode: "timestamp" }),
   description: text("description").notNull(),
-  technologies: text("technologies").array(),
-  published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  technologies: text("technologies", { mode: "json" }).$type<string[]>(),
+  published: integer("published", { mode: "boolean" }).default(false),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Achievements table
-export const achievements = pgTable("achievements", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  title: varchar("title", { length: 255 }).notNull(),
+export const achievements = sqliteTable("achievements", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
   description: text("description").notNull(),
-  date: timestamp("date").notNull(),
-  type: varchar("type", { length: 50 }).notNull(), // certification, award, speaking, etc
-  certificateUrl: varchar("certificate_url"),
-  published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  date: integer("date", { mode: "timestamp" }).notNull(),
+  type: text("type").notNull(), // certification, award, speaking, etc
+  certificateUrl: text("certificate_url"),
+  published: integer("published", { mode: "boolean" }).default(false),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Likes table
-export const likes = pgTable("likes", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  itemType: varchar("item_type", { length: 50 }).notNull(), // project, achievement, comment
-  itemId: varchar("item_id").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+export const likes = sqliteTable("likes", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  itemType: text("item_type").notNull(), // project, achievement, comment
+  itemId: text("item_id").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Comments table
-export const comments = pgTable("comments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  itemType: varchar("item_type", { length: 50 }).notNull(), // project, achievement
-  itemId: varchar("item_id").notNull(),
+export const comments = sqliteTable("comments", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  itemType: text("item_type").notNull(), // project, achievement
+  itemId: text("item_id").notNull(),
   content: text("content").notNull(),
-  parentId: varchar("parent_id").references(() => comments.id, { onDelete: 'cascade' }),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  parentId: text("parent_id"),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
+});
+
+// Files table for uploads
+export const files = sqliteTable("files", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  filename: text("filename").notNull(),
+  originalName: text("original_name").notNull(),
+  mimetype: text("mimetype").notNull(),
+  size: integer("size").notNull(),
+  path: text("path").notNull(),
+  url: text("url").notNull(),
+  uploadedBy: text("uploaded_by").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   likes: many(likes),
   comments: many(comments),
+  files: many(files),
 }));
 
 export const likesRelations = relations(likes, ({ one }) => ({
@@ -123,6 +137,13 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
     references: [comments.id],
   }),
   replies: many(comments),
+}));
+
+export const filesRelations = relations(files, ({ one }) => ({
+  user: one(users, {
+    fields: [files.uploadedBy],
+    references: [users.id],
+  }),
 }));
 
 // Insert schemas
@@ -162,3 +183,4 @@ export type Achievement = typeof achievements.$inferSelect;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type Comment = typeof comments.$inferSelect;
 export type Like = typeof likes.$inferSelect;
+export type File = typeof files.$inferSelect;

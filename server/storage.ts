@@ -106,11 +106,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProjects(): Promise<Project[]> {
-    return await db
+    const results = await db
       .select()
       .from(projects)
       .where(eq(projects.published, true))
       .orderBy(desc(projects.createdAt));
+    return results.map(project => ({
+      ...project,
+      technologies: project.technologies ? JSON.parse(project.technologies as unknown as string) : []
+    }));
+  }
+
+  async getAllProjects(): Promise<Project[]> {
+    const results = await db
+      .select()
+      .from(projects)
+      .orderBy(desc(projects.createdAt));
+    return results.map(project => ({
+      ...project,
+      technologies: project.technologies ? JSON.parse(project.technologies as unknown as string) : []
+    }));
   }
 
   async getFeaturedProjects(): Promise<Project[]> {
@@ -127,17 +142,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const [newProject] = await db.insert(projects).values(project).returning();
-    return newProject;
+    const projectData = {
+      ...project,
+      technologies: project.technologies ? JSON.stringify(project.technologies) : null
+    };
+    const [newProject] = await db.insert(projects).values(projectData as any).returning();
+    return {
+      ...newProject,
+      technologies: newProject.technologies ? JSON.parse(newProject.technologies as unknown as string) : []
+    };
   }
 
   async updateProject(id: string, project: Partial<InsertProject>): Promise<Project> {
+    const projectData = {
+      ...project,
+      technologies: project.technologies ? JSON.stringify(project.technologies) : undefined,
+      updatedAt: Date.now()
+    };
     const [updatedProject] = await db
       .update(projects)
-      .set({ ...project, updatedAt: new Date() })
+      .set(projectData as any)
       .where(eq(projects.id, id))
       .returning();
-    return updatedProject;
+    return {
+      ...updatedProject,
+      technologies: updatedProject.technologies ? JSON.parse(updatedProject.technologies as unknown as string) : []
+    };
   }
 
   async deleteProject(id: string): Promise<void> {
@@ -145,11 +175,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getExperiences(): Promise<Experience[]> {
-    return await db
+    const results = await db
       .select()
       .from(experiences)
       .where(eq(experiences.published, true))
       .orderBy(desc(experiences.startDate));
+    return results.map(experience => ({
+      ...experience,
+      technologies: experience.technologies ? JSON.parse(experience.technologies as unknown as string) : []
+    }));
+  }
+
+  async getAllExperiences(): Promise<Experience[]> {
+    const results = await db
+      .select()
+      .from(experiences)
+      .orderBy(desc(experiences.startDate));
+    return results.map(experience => ({
+      ...experience,
+      technologies: experience.technologies ? JSON.parse(experience.technologies as unknown as string) : []
+    }));
   }
 
   async getExperienceById(id: string): Promise<Experience | undefined> {
@@ -158,17 +203,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createExperience(experience: InsertExperience): Promise<Experience> {
-    const [newExperience] = await db.insert(experiences).values(experience).returning();
-    return newExperience;
+    const experienceData = {
+      ...experience,
+      technologies: experience.technologies ? JSON.stringify(experience.technologies) : null
+    };
+    const [newExperience] = await db.insert(experiences).values(experienceData as any).returning();
+    return {
+      ...newExperience,
+      technologies: newExperience.technologies ? JSON.parse(newExperience.technologies as unknown as string) : []
+    };
   }
 
   async updateExperience(id: string, experience: Partial<InsertExperience>): Promise<Experience> {
+    const experienceData = {
+      ...experience,
+      technologies: experience.technologies ? JSON.stringify(experience.technologies) : undefined,
+      updatedAt: Date.now()
+    };
     const [updatedExperience] = await db
       .update(experiences)
-      .set({ ...experience, updatedAt: new Date() })
+      .set(experienceData as any)
       .where(eq(experiences.id, id))
       .returning();
-    return updatedExperience;
+    return {
+      ...updatedExperience,
+      technologies: updatedExperience.technologies ? JSON.parse(updatedExperience.technologies as unknown as string) : []
+    };
   }
 
   async deleteExperience(id: string): Promise<void> {
@@ -180,6 +240,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(achievements)
       .where(eq(achievements.published, true))
+      .orderBy(desc(achievements.date));
+  }
+
+  async getAllAchievements(): Promise<Achievement[]> {
+    return await db
+      .select()
+      .from(achievements)
       .orderBy(desc(achievements.date));
   }
 

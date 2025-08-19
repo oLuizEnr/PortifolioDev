@@ -1,20 +1,19 @@
 import session from "express-session";
 import type { Express, RequestHandler } from "express";
-import connectPg from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { storage } from "./storage";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
+  
+  // Use memory store for local development  
+  const MemoryStoreSession = MemoryStore(session);
+  const sessionStore = new MemoryStoreSession({
+    checkPeriod: sessionTtl,
   });
   
   return session({
-    secret: process.env.SESSION_SECRET || "local-dev-secret-key",
+    secret: "portfolio-local-secret-key-2024",
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -59,8 +58,11 @@ declare global {
     interface Request {
       user?: any;
     }
-    interface Session {
-      userId?: string;
-    }
+  }
+}
+
+declare module "express-session" {
+  interface SessionData {
+    userId?: string;
   }
 }

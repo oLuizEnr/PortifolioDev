@@ -4,31 +4,16 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { insertProjectSchema, insertExperienceSchema, insertAchievementSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
-import multer from "multer";
-import path from "path";
+import { upload, UploadService } from "./upload";
+import express from "express";
 
-// Configure multer for file uploads
-const upload = multer({
-  dest: 'uploads/',
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only images are allowed'));
-    }
-  },
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static('uploads'));
 
   // Auth routes
   app.post('/api/login', async (req, res) => {
@@ -69,13 +54,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin middleware
   const isAdmin = async (req: any, res: any, next: any) => {
     try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
+      if (!req.user) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const user = await storage.getUser(userId);
-      if (!user || !user.isAdmin) {
+      if (!req.user.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
 
@@ -319,20 +302,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload route
-  app.post('/api/upload', isAuthenticated, isAdmin, upload.single('file'), (req, res) => {
+  // File upload routes
+  app.post('/api/upload', isAuthenticated, isAdmin, upload.single('file'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      // In a real application, you would upload to cloud storage (AWS S3, Cloudinary, etc.)
-      // For now, we'll just return a placeholder URL
-      const fileUrl = `/uploads/${req.file.filename}`;
-      res.json({ url: fileUrl });
+      const userId = req.user.id;
+      const fileRecord = await UploadService.saveFileRecord(req.file, userId);
+      res.json({ 
+        id: fileRecord.id,
+        url: fileRecord.url,
+        filename: fileRecord.filename,
+        originalName: fileRecord.originalName
+      });
     } catch (error) {
       console.error("Error uploading file:", error);
       res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+
+  app.delete('/api/files/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      await UploadService.deleteFile(req.params.id);
+      res.json({ message: "File deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      res.status(500).json({ message: "Failed to delete file" });
+    }
+  });
+
+  // Admin routes for managing user profile (LinkedIn, etc.)
+  app.put('/api/admin/profile', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { linkedinUrl, firstName, lastName, profileImageUrl } = req.body;
+      
+      // Update user profile
+      const updatedUser = await storage.upsertUser({
+        id: userId,
+        email: req.user.email,
+        password: req.user.password,
+        linkedinUrl,
+        firstName,
+        lastName,
+        profileImageUrl,
+        isAdmin: req.user.isAdmin
+      });
+      
+      res.json({ ...updatedUser, password: undefined });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Admin route to get all projects (published and unpublished)
+  app.get('/api/admin/projects', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const projects = await storage.getAllProjects(); // We need to add this method
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching all projects:", error);
+      res.status(500).json({ message: "Failed to fetch projects" });
+    }
+  });
+
+  // Admin route to get all experiences (published and unpublished)
+  app.get('/api/admin/experiences', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const experiences = await storage.getAllExperiences(); // We need to add this method
+      res.json(experiences);
+    } catch (error) {
+      console.error("Error fetching all experiences:", error);
+      res.status(500).json({ message: "Failed to fetch experiences" });
+    }
+  });
+
+  // Admin route to get all achievements (published and unpublished)
+  app.get('/api/admin/achievements', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements(); // We need to add this method
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching all achievements:", error);
+      res.status(500).json({ message: "Failed to fetch achievements" });
     }
   });
 
