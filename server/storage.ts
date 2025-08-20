@@ -93,13 +93,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async initializeDefaultUser(): Promise<void> {
-    const existingUser = await this.getUserByEmail("teste@teste");
+    const existingUser = await this.getUserByEmail("admin@portfolio.dev");
     if (!existingUser) {
       await this.createUser({
-        email: "teste@teste",
-        password: "01234567",
-        firstName: "Luiz",
-        lastName: "Enrique",
+        email: "admin@portfolio.dev",
+        password: "Admin123!",
+        firstName: "Admin",
+        lastName: "Portfolio",
         isAdmin: true,
       });
     }

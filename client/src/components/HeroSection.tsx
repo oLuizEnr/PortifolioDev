@@ -1,8 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Download } from "lucide-react";
+import { MapPin, Download, Github, Linkedin, Mail } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+interface ProfileData {
+  firstName: string;
+  lastName: string;
+  profileImageUrl?: string;
+  heroImageUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+}
 
 export default function HeroSection() {
+  const { data: profile } = useQuery<ProfileData>({
+    queryKey: ['/api/profile'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Default values
+  const name = profile ? `${profile.firstName || 'Admin'} ${profile.lastName || 'Portfolio'}` : 'Seu Nome';
+  const heroImage = profile?.heroImageUrl || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
   const scrollToProjects = () => {
     document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -25,7 +43,7 @@ export default function HeroSection() {
             </div>
             <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6" data-testid="text-hero-title">
               Olá, eu sou{" "}
-              <span className="text-primary">Luiz Enrique</span>
+              <span className="text-primary">{name}</span>
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed" data-testid="text-hero-description">
               Desenvolvedor Full Stack apaixonado por criar soluções digitais inovadoras. 
@@ -52,36 +70,45 @@ export default function HeroSection() {
             
             {/* Social Links */}
             <div className="flex items-center space-x-6 mt-8">
+              {profile?.linkedinUrl && (
+                <a 
+                  href={profile.linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-slate-500 hover:text-primary transition-colors"
+                  data-testid="link-linkedin"
+                >
+                  <Linkedin className="w-6 h-6" />
+                </a>
+              )}
+              {profile?.githubUrl && (
+                <a 
+                  href={profile.githubUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-slate-500 hover:text-primary transition-colors"
+                  data-testid="link-github"
+                >
+                  <Github className="w-6 h-6" />
+                </a>
+              )}
               <a 
-                href="#" 
-                className="text-slate-500 hover:text-primary transition-colors text-xl"
-                data-testid="link-linkedin"
-              >
-                <i className="fab fa-linkedin"></i>
-              </a>
-              <a 
-                href="#" 
-                className="text-slate-500 hover:text-primary transition-colors text-xl"
-                data-testid="link-github"
-              >
-                <i className="fab fa-github"></i>
-              </a>
-              <a 
-                href="#" 
-                className="text-slate-500 hover:text-primary transition-colors text-xl"
+                href="mailto:contato@portfolio.dev" 
+                className="text-slate-500 hover:text-primary transition-colors"
                 data-testid="link-email"
               >
-                <i className="fas fa-envelope"></i>
+                <Mail className="w-6 h-6" />
               </a>
             </div>
           </div>
           
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <img 
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=500" 
-              alt="Luiz Enrique - Desenvolvedor Full Stack" 
+              src={heroImage} 
+              alt={`${name} - Desenvolvedor Full Stack`} 
               className="w-80 h-80 rounded-2xl shadow-2xl object-cover"
               data-testid="img-profile"
+              loading="lazy"
             />
           </div>
         </div>

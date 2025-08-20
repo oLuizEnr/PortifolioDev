@@ -26,7 +26,9 @@ sqlite.exec(`
     first_name TEXT,
     last_name TEXT,
     profile_image_url TEXT,
+    hero_image_url TEXT,
     linkedin_url TEXT,
+    github_url TEXT,
     is_admin INTEGER DEFAULT 0,
     created_at INTEGER DEFAULT (unixepoch()),
     updated_at INTEGER DEFAULT (unixepoch())

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Plus, Briefcase, Trophy, MessageCircle, BarChart, Settings, Upload, LinkedinIcon, User, Image, FolderOpen } from "lucide-react";
+import { X, Plus, Briefcase, Trophy, MessageCircle, BarChart, Settings, Upload, LinkedinIcon, User, Image, FolderOpen, Github } from "lucide-react";
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -26,7 +26,9 @@ export default function AdminPanel({
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('create');
   const [linkedinUrl, setLinkedinUrl] = useState((user as any)?.linkedinUrl || '');
+  const [githubUrl, setGithubUrl] = useState((user as any)?.githubUrl || '');
   const [profileImage, setProfileImage] = useState((user as any)?.profileImageUrl || '');
+  const [heroImage, setHeroImage] = useState((user as any)?.heroImageUrl || '');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,7 +71,9 @@ export default function AdminPanel({
         },
         body: JSON.stringify({
           linkedinUrl,
-          profileImageUrl: profileImage
+          githubUrl,
+          profileImageUrl: profileImage,
+          heroImageUrl: heroImage
         })
       });
 
@@ -255,6 +259,20 @@ export default function AdminPanel({
                     />
                   </div>
                 </div>
+
+                <div>
+                  <Label htmlFor="github">URL do GitHub</Label>
+                  <div className="flex space-x-2">
+                    <Github className="w-5 h-5 text-gray-800 mt-2" />
+                    <Input
+                      id="github"
+                      type="url"
+                      value={githubUrl}
+                      onChange={(e) => setGithubUrl(e.target.value)}
+                      placeholder="https://github.com/seu-usuario"
+                    />
+                  </div>
+                </div>
                 
                 <div>
                   <Label htmlFor="profileImage">Imagem de Perfil</Label>
@@ -270,6 +288,24 @@ export default function AdminPanel({
                   {profileImage && (
                     <div className="mt-2">
                       <img src={profileImage} alt="Preview" className="w-20 h-20 rounded-full object-cover" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="heroImage">Imagem Hero (Página Inicial)</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      id="heroImage"
+                      type="url"
+                      value={heroImage}
+                      onChange={(e) => setHeroImage(e.target.value)}
+                      placeholder="URL da imagem para a página inicial"
+                    />
+                  </div>
+                  {heroImage && (
+                    <div className="mt-2">
+                      <img src={heroImage} alt="Hero Preview" className="w-32 h-32 rounded-lg object-cover" />
                     </div>
                   )}
                 </div>

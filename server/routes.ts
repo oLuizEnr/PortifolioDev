@@ -2,10 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
-import { insertProjectSchema, insertExperienceSchema, insertAchievementSchema, insertCommentSchema } from "@shared/schema";
+import { insertProjectSchema, insertExperienceSchema, insertAchievementSchema, insertCommentSchema, users } from "@shared/schema";
 import { z } from "zod";
 import { upload, UploadService } from "./upload";
 import express from "express";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -337,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/admin/profile', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const { linkedinUrl, firstName, lastName, profileImageUrl } = req.body;
+      const { linkedinUrl, githubUrl, firstName, lastName, profileImageUrl, heroImageUrl } = req.body;
       
       // Update user profile
       const updatedUser = await storage.upsertUser({
@@ -345,9 +347,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: req.user.email,
         password: req.user.password,
         linkedinUrl,
+        githubUrl,
         firstName,
         lastName,
         profileImageUrl,
+        heroImageUrl,
         isAdmin: req.user.isAdmin
       });
       
@@ -355,6 +359,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Public route to get admin profile for hero section
+  app.get('/api/profile', async (req, res) => {
+    try {
+      const adminUsers = await db.select().from(users).where(eq(users.isAdmin, true)).limit(1);
+      if (adminUsers.length === 0) {
+        return res.status(404).json({ message: "Admin profile not found" });
+      }
+
+      const admin = adminUsers[0];
+      res.json({
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        profileImageUrl: admin.profileImageUrl,
+        heroImageUrl: admin.heroImageUrl || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        linkedinUrl: admin.linkedinUrl,
+        githubUrl: admin.githubUrl
+      });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
     }
   });
 
