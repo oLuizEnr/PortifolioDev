@@ -10,14 +10,14 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("teste@teste");
-  const [password, setPassword] = useState("01234567");
+  const [email, setEmail] = useState("admin@portfolio.dev");
+  const [password, setPassword] = useState("Admin123!");
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      return await apiRequest("/api/login", "POST", credentials);
+      return await apiRequest("POST", "/api/login", credentials);
     },
     onSuccess: () => {
       toast({
@@ -98,9 +98,9 @@ export default function Login() {
             <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
               <strong>Credenciais padrão:</strong>
               <br />
-              Email: teste@teste
+              Email: admin@portfolio.dev
               <br />
-              Senha: 01234567
+              Senha: Admin123!
             </p>
           </div>
         </CardContent>

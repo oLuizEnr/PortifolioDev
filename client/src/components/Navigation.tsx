@@ -18,7 +18,7 @@ export default function Navigation({ onLogin, onToggleAdmin, showAdmin }: Naviga
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/logout", "POST");
+      return await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
