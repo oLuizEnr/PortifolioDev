@@ -124,6 +124,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin-only routes to get all items
+  app.get('/api/admin/projects', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const projects = await storage.getAllProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching all projects:", error);
+      res.status(500).json({ message: "Failed to fetch projects" });
+    }
+  });
+
+  app.get('/api/admin/experiences', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const experiences = await storage.getAllExperiences();
+      res.json(experiences);
+    } catch (error) {
+      console.error("Error fetching all experiences:", error);
+      res.status(500).json({ message: "Failed to fetch experiences" });
+    }
+  });
+
+  app.get('/api/admin/achievements', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching all achievements:", error);
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
   // Protected routes for projects
   app.post('/api/projects', isAuthenticated, isAdmin, async (req, res) => {
     try {

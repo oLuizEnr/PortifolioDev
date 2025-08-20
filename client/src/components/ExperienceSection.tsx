@@ -1,10 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarDays, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, Eye } from "lucide-react";
+import { useLocation } from "wouter";
 import type { Experience } from "@shared/schema";
 
 export default function ExperienceSection() {
+  const [, setLocation] = useLocation();
+  
   const { data: experiences = [], isLoading } = useQuery({
     queryKey: ["/api/experiences"],
   });
@@ -88,7 +92,7 @@ export default function ExperienceSection() {
                       </p>
                       
                       {experience.technologies && experience.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 mb-4">
                           {experience.technologies.map((tech, techIndex) => (
                             <Badge 
                               key={techIndex} 
@@ -101,6 +105,18 @@ export default function ExperienceSection() {
                           ))}
                         </div>
                       )}
+                      
+                      <div className="flex justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setLocation(`/experience/${experience.id}`)}
+                          data-testid={`button-details-${index}`}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Ver Detalhes
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>

@@ -10,6 +10,9 @@ import Home from "@/pages/Home";
 import Admin from "@/pages/Admin";
 import ProjectDetails from "@/pages/ProjectDetails";
 import Login from "@/pages/Login";
+import AdminProjects from "@/pages/AdminProjects";
+import AdminExperiences from "@/pages/AdminExperiences";
+import AdminAchievements from "@/pages/AdminAchievements";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -26,6 +29,9 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/admin" component={Admin} />
+          <Route path="/admin/projects" component={AdminProjects} />
+          <Route path="/admin/experiences" component={AdminExperiences} />
+          <Route path="/admin/achievements" component={AdminAchievements} />
           <Route path="/project/:id" component={ProjectDetails} />
         </>
       )}

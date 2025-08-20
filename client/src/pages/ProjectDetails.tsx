@@ -21,7 +21,7 @@ export default function ProjectDetails() {
   const { toast } = useToast();
 
   const { data: project, isLoading: projectLoading } = useQuery({
-    queryKey: ["/api/projects", id],
+    queryKey: [`/api/projects/${id}`],
   });
 
   const { data: likeData } = useQuery({

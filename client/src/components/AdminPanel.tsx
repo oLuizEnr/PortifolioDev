@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label";
 import { X, Plus, Briefcase, Trophy, MessageCircle, BarChart, Settings, Upload, LinkedinIcon, User, Image, FolderOpen, Github } from "lucide-react";
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -24,6 +27,8 @@ export default function AdminPanel({
   onViewComments
 }: AdminPanelProps) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('create');
   const [linkedinUrl, setLinkedinUrl] = useState((user as any)?.linkedinUrl || '');
   const [githubUrl, setGithubUrl] = useState((user as any)?.githubUrl || '');
@@ -62,29 +67,33 @@ export default function AdminPanel({
     }
   };
 
-  const handleSaveProfile = async () => {
-    try {
-      const response = await fetch('/api/admin/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          linkedinUrl,
-          githubUrl,
-          profileImageUrl: profileImage,
-          heroImageUrl: heroImage
-        })
+  const profileMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("PUT", "/api/admin/profile", {
+        linkedinUrl,
+        githubUrl,
+        profileImageUrl: profileImage,
+        heroImageUrl: heroImage
       });
-
-      if (response.ok) {
-        alert('Perfil atualizado com sucesso!');
-      } else {
-        alert('Erro ao atualizar perfil');
-      }
-    } catch (error) {
-      alert('Erro ao atualizar perfil');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      toast({
+        title: "Sucesso",
+        description: "Perfil atualizado com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar perfil",
+        variant: "destructive"
+      });
     }
+  });
+
+  const handleSaveProfile = () => {
+    profileMutation.mutate();
   };
 
   const adminActions = [

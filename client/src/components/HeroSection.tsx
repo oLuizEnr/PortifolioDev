@@ -15,7 +15,7 @@ interface ProfileData {
 export default function HeroSection() {
   const { data: profile } = useQuery<ProfileData>({
     queryKey: ['/api/profile'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // No cache to update immediately
   });
 
   // Default values

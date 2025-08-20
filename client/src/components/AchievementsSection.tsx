@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Share2, Trophy, Award, GraduationCap, Medal, CalendarDays } from "lucide-react";
+import { Heart, Share2, Trophy, Award, GraduationCap, Medal, CalendarDays, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import type { Achievement } from "@shared/schema";
 
 interface AchievementsSectionProps {
@@ -42,6 +43,7 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const { data: achievements = [], isLoading } = useQuery({
     queryKey: ["/api/achievements"],
@@ -199,13 +201,23 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
                       <p className="text-slate-600 mb-3" data-testid={`text-achievement-description-${index}`}>
                         {achievement.description}
                       </p>
+                      <div className="flex items-center text-sm text-slate-500 mb-4">
+                        <CalendarDays className="w-4 h-4 mr-1" />
+                        <span data-testid={`text-achievement-date-${index}`}>
+                          {formatDate(achievement.date)}
+                        </span>
+                      </div>
+                      
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-slate-500">
-                          <CalendarDays className="w-4 h-4 mr-1" />
-                          <span data-testid={`text-achievement-date-${index}`}>
-                            {formatDate(achievement.date)}
-                          </span>
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setLocation(`/achievement/${achievement.id}`)}
+                          data-testid={`button-details-${index}`}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Ver Detalhes
+                        </Button>
                         {achievement.certificateUrl && (
                           <Button
                             variant="ghost"
