@@ -60,8 +60,8 @@ export default function ExperienceModal({ isOpen, onClose, experience }: Experie
     mutationFn: async (data: any) => {
       const submitData = {
         ...data,
-        startDate: new Date(data.startDate),
-        endDate: data.endDate ? new Date(data.endDate) : undefined
+        startDate: data.startDate, // Send as string, let backend handle conversion
+        endDate: data.endDate || undefined
       };
       
       if (experience) {

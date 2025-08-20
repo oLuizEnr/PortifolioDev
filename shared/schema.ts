@@ -148,7 +148,7 @@ export const filesRelations = relations(files, ({ one }) => ({
   }),
 }));
 
-// Insert schemas
+// Insert schemas with date string handling
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
@@ -159,12 +159,23 @@ export const insertExperienceSchema = createInsertSchema(experiences).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  startDate: z.union([z.date(), z.string()]).transform(val => 
+    typeof val === 'string' ? new Date(val) : val
+  ),
+  endDate: z.union([z.date(), z.string(), z.null(), z.undefined()]).optional().transform(val => 
+    val && typeof val === 'string' ? new Date(val) : val
+  ),
 });
 
 export const insertAchievementSchema = createInsertSchema(achievements).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  date: z.union([z.date(), z.string()]).transform(val => 
+    typeof val === 'string' ? new Date(val) : val
+  ),
 });
 
 export const insertCommentSchema = createInsertSchema(comments).omit({

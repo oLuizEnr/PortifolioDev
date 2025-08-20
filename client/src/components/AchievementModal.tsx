@@ -64,7 +64,7 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
     mutationFn: async (data: any) => {
       const submitData = {
         ...data,
-        date: new Date(data.date)
+        date: data.date // Send as string, let backend handle conversion
       };
       
       if (achievement) {
