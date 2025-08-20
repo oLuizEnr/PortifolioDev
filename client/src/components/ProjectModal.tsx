@@ -27,7 +27,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
     liveUrl: '',
     technologies: [] as string[],
     featured: false,
-    published: false
+    published: true
   });
   const [newTech, setNewTech] = useState('');
   const queryClient = useQueryClient();
@@ -54,7 +54,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
         liveUrl: '',
         technologies: [],
         featured: false,
-        published: false
+        published: true
       });
     }
   }, [project, isOpen]);
@@ -69,6 +69,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/featured"] });
       toast({
         title: "Sucesso",
         description: project ? "Projeto atualizado com sucesso!" : "Projeto criado com sucesso!",
@@ -92,6 +93,7 @@ export default function ProjectModal({ isOpen, onClose, project }: ProjectModalP
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/featured"] });
       toast({
         title: "Sucesso",
         description: "Projeto excluído com sucesso!",

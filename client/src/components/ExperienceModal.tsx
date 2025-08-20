@@ -26,7 +26,7 @@ export default function ExperienceModal({ isOpen, onClose, experience }: Experie
     endDate: '',
     description: '',
     technologies: [] as string[],
-    published: false
+    published: true
   });
   const [newTech, setNewTech] = useState('');
   const queryClient = useQueryClient();
@@ -51,7 +51,7 @@ export default function ExperienceModal({ isOpen, onClose, experience }: Experie
         endDate: '',
         description: '',
         technologies: [],
-        published: false
+        published: true
       });
     }
   }, [experience, isOpen]);

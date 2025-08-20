@@ -21,7 +21,7 @@ export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps
   const [, setLocation] = useLocation();
 
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ["/api/projects/featured"],
+    queryKey: ["/api/projects"],
   });
 
   const likeMutation = useMutation({

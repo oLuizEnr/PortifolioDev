@@ -33,7 +33,7 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
     date: '',
     type: 'certification',
     certificateUrl: '',
-    published: false
+    published: true
   });
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -55,7 +55,7 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
         date: '',
         type: 'certification',
         certificateUrl: '',
-        published: false
+        published: true
       });
     }
   }, [achievement, isOpen]);
