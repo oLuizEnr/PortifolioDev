@@ -47,8 +47,33 @@ export default function AdminPanel({
     }
   }, [user]);
 
-  if (!isOpen) return null;
+  // All mutations must be defined before any conditional returns
+  const profileMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("PUT", "/api/admin/profile", {
+        linkedinUrl,
+        githubUrl,
+        profileImageUrl: profileImage,
+        heroImageUrl: heroImage
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      toast({
+        title: "Sucesso",
+        description: "Perfil atualizado com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar perfil",
+        variant: "destructive"
+      });
+    }
+  });
 
+  // Functions that don't use hooks can be defined anywhere
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -77,34 +102,12 @@ export default function AdminPanel({
     }
   };
 
-  const profileMutation = useMutation({
-    mutationFn: async () => {
-      await apiRequest("PUT", "/api/admin/profile", {
-        linkedinUrl,
-        githubUrl,
-        profileImageUrl: profileImage,
-        heroImageUrl: heroImage
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
-      toast({
-        title: "Sucesso",
-        description: "Perfil atualizado com sucesso!"
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar perfil",
-        variant: "destructive"
-      });
-    }
-  });
-
   const handleSaveProfile = () => {
     profileMutation.mutate();
   };
+
+  // Early return after all hooks are defined
+  if (!isOpen) return null;
 
   const adminActions = [
     {
