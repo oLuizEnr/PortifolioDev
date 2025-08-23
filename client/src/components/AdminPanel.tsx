@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Plus, Briefcase, Trophy, MessageCircle, BarChart, Settings, Upload, LinkedinIcon, User, Image, FolderOpen, Github } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -30,12 +30,22 @@ export default function AdminPanel({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('create');
-  const [linkedinUrl, setLinkedinUrl] = useState((user as any)?.linkedinUrl || '');
-  const [githubUrl, setGithubUrl] = useState((user as any)?.githubUrl || '');
-  const [profileImage, setProfileImage] = useState((user as any)?.profileImageUrl || '');
-  const [heroImage, setHeroImage] = useState((user as any)?.heroImageUrl || '');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
+  const [profileImage, setProfileImage] = useState('');
+  const [heroImage, setHeroImage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update state when user data changes
+  useEffect(() => {
+    if (user) {
+      setLinkedinUrl((user as any)?.linkedinUrl || '');
+      setGithubUrl((user as any)?.githubUrl || '');
+      setProfileImage((user as any)?.profileImageUrl || '');
+      setHeroImage((user as any)?.heroImageUrl || '');
+    }
+  }, [user]);
 
   if (!isOpen) return null;
 

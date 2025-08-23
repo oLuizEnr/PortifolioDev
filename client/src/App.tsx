@@ -13,6 +13,11 @@ import Login from "@/pages/Login";
 import AdminProjects from "@/pages/AdminProjects";
 import AdminExperiences from "@/pages/AdminExperiences";
 import AdminAchievements from "@/pages/AdminAchievements";
+import ExperienceDetails from "@/pages/ExperienceDetails";
+import AchievementDetails from "@/pages/AchievementDetails";
+import AllProjects from "@/pages/AllProjects";
+import AllExperiences from "@/pages/AllExperiences";
+import AllAchievements from "@/pages/AllAchievements";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,6 +29,11 @@ function Router() {
         <>
           <Route path="/" component={Landing} />
           <Route path="/project/:id" component={ProjectDetails} />
+          <Route path="/experience/:id" component={ExperienceDetails} />
+          <Route path="/achievement/:id" component={AchievementDetails} />
+          <Route path="/projects" component={AllProjects} />
+          <Route path="/experiences" component={AllExperiences} />
+          <Route path="/achievements" component={AllAchievements} />
         </>
       ) : (
         <>
@@ -33,6 +43,11 @@ function Router() {
           <Route path="/admin/experiences" component={AdminExperiences} />
           <Route path="/admin/achievements" component={AdminAchievements} />
           <Route path="/project/:id" component={ProjectDetails} />
+          <Route path="/experience/:id" component={ExperienceDetails} />
+          <Route path="/achievement/:id" component={AchievementDetails} />
+          <Route path="/projects" component={AllProjects} />
+          <Route path="/experiences" component={AllExperiences} />
+          <Route path="/achievements" component={AllAchievements} />
         </>
       )}
       <Route component={NotFound} />

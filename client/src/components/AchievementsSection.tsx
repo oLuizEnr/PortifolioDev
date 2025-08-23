@@ -45,7 +45,7 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  const { data: achievements = [], isLoading } = useQuery({
+  const { data: achievements = [], isLoading } = useQuery<Achievement[]>({
     queryKey: ["/api/achievements"],
   });
 
@@ -157,7 +157,7 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
         </div>
         
         <div className="grid lg:grid-cols-2 gap-8">
-          {achievements.map((achievement: Achievement, index) => {
+          {achievements.map((achievement, index: number) => {
             const IconComponent = getIconForType(achievement.type);
             const colorClass = getColorForType(achievement.type);
             
@@ -240,7 +240,11 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
         </div>
         
         <div className="text-center mt-12">
-          <Button size="lg" data-testid="button-view-all-achievements">
+          <Button 
+            size="lg" 
+            onClick={() => setLocation('/achievements')}
+            data-testid="button-view-all-achievements"
+          >
             Ver Todas as Conquistas
           </Button>
         </div>

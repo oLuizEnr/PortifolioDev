@@ -20,7 +20,7 @@ export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  const { data: projects = [], isLoading } = useQuery({
+  const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
   });
 
@@ -123,7 +123,7 @@ export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps
         </div>
         
         <div className="grid lg:grid-cols-3 gap-8">
-          {projects.map((project: Project) => (
+          {projects.map((project) => (
             <Card 
               key={project.id} 
               className="overflow-hidden hover:shadow-lg transition-shadow"
@@ -225,7 +225,11 @@ export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps
         </div>
         
         <div className="text-center mt-12">
-          <Button size="lg" data-testid="button-view-all-projects">
+          <Button 
+            size="lg" 
+            onClick={() => setLocation('/projects')}
+            data-testid="button-view-all-projects"
+          >
             Ver Todos os Projetos
           </Button>
         </div>

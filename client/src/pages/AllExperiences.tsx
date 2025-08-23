@@ -1,14 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Eye } from "lucide-react";
-import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, CalendarDays, Eye } from "lucide-react";
 import type { Experience } from "@shared/schema";
 
-export default function ExperienceSection() {
-  const [, setLocation] = useLocation();
-  
+export default function AllExperiences() {
   const { data: experiences = [], isLoading } = useQuery<Experience[]>({
     queryKey: ["/api/experiences"],
   });
@@ -22,37 +20,39 @@ export default function ExperienceSection() {
 
   if (isLoading) {
     return (
-      <section id="experience" className="py-20 bg-white">
+      <div className="min-h-screen bg-slate-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-              Experiência Profissional
-            </h2>
-          </div>
-          <div className="max-w-4xl mx-auto space-y-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-32 bg-slate-200 rounded-xl"></div>
-              </div>
-            ))}
+          <div className="animate-pulse">
+            <div className="h-8 bg-slate-200 rounded mb-6"></div>
+            <div className="space-y-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-32 bg-slate-200 rounded"></div>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section id="experience" className="py-20 bg-white">
+    <div className="min-h-screen bg-slate-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4" data-testid="text-experience-title">
+        <div className="mb-8">
+          <Link href="/">
+            <Button variant="outline" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-slate-800 mb-4">
             Experiência Profissional
-          </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Minha trajetória profissional no desenvolvimento de software
+          </h1>
+          <p className="text-lg text-slate-600">
+            Minha trajetória completa no desenvolvimento de software
           </p>
         </div>
-        
+
         <div className="max-w-4xl mx-auto">
           <div className="relative">
             {/* Timeline line */}
@@ -68,26 +68,26 @@ export default function ExperienceSection() {
                   {/* Timeline dot */}
                   <div className="absolute left-8 top-2 w-2 h-2 bg-primary rounded-full transform -translate-x-1/2"></div>
                   
-                  <Card className="bg-slate-50">
+                  <Card className="bg-white">
                     <CardContent className="p-6">
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-semibold text-slate-800" data-testid={`text-position-${index}`}>
+                          <h3 className="text-xl font-semibold text-slate-800">
                             {experience.position}
                           </h3>
-                          <p className="text-primary font-medium" data-testid={`text-company-${index}`}>
+                          <p className="text-primary font-medium">
                             {experience.company}
                           </p>
                         </div>
                         <div className="flex items-center text-slate-500 text-sm lg:text-base mt-2 lg:mt-0">
                           <CalendarDays className="w-4 h-4 mr-1" />
-                          <span data-testid={`text-period-${index}`}>
+                          <span>
                             {formatDate(experience.startDate)} - {experience.endDate ? formatDate(experience.endDate) : 'Presente'}
                           </span>
                         </div>
                       </div>
                       
-                      <p className="text-slate-600 mb-4" data-testid={`text-description-${index}`}>
+                      <p className="text-slate-600 mb-4">
                         {experience.description}
                       </p>
                       
@@ -98,7 +98,6 @@ export default function ExperienceSection() {
                               key={techIndex} 
                               variant="outline" 
                               className="bg-primary/5 text-primary border-primary/20"
-                              data-testid={`badge-tech-${index}-${techIndex}`}
                             >
                               {tech}
                             </Badge>
@@ -107,15 +106,12 @@ export default function ExperienceSection() {
                       )}
                       
                       <div className="flex justify-end">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setLocation(`/experience/${experience.id}`)}
-                          data-testid={`button-details-${index}`}
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          Ver Detalhes
-                        </Button>
+                        <Link href={`/experience/${experience.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Ver Detalhes
+                          </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>
@@ -123,18 +119,14 @@ export default function ExperienceSection() {
               ))}
             </div>
           </div>
-          
-          <div className="text-center mt-12">
-            <Button 
-              size="lg" 
-              onClick={() => setLocation('/experiences')}
-              data-testid="button-view-all-experiences"
-            >
-              Ver Toda Experiência
-            </Button>
-          </div>
         </div>
+
+        {(experiences as Experience[]).length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-slate-600">Nenhuma experiência encontrada.</p>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
