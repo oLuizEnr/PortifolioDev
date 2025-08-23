@@ -238,6 +238,12 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
             );
           })}
         </div>
+        
+        <div className="text-center mt-12">
+          <Button size="lg" data-testid="button-view-all-achievements">
+            Ver Todas as Conquistas
+          </Button>
+        </div>
       </div>
     </section>
   );

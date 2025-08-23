@@ -123,6 +123,12 @@ export default function ExperienceSection() {
               ))}
             </div>
           </div>
+          
+          <div className="text-center mt-12">
+            <Button size="lg" data-testid="button-view-all-experiences">
+              Ver Toda Experiência
+            </Button>
+          </div>
         </div>
       </div>
     </section>
