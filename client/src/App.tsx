@@ -13,6 +13,7 @@ import Login from "@/pages/Login";
 import AdminProjects from "@/pages/AdminProjects";
 import AdminExperiences from "@/pages/AdminExperiences";
 import AdminAchievements from "@/pages/AdminAchievements";
+import AdminComments from "@/pages/AdminComments";
 import ExperienceDetails from "@/pages/ExperienceDetails";
 import AchievementDetails from "@/pages/AchievementDetails";
 import AllProjects from "@/pages/AllProjects";
@@ -42,6 +43,7 @@ function Router() {
           <Route path="/admin/projects" component={AdminProjects} />
           <Route path="/admin/experiences" component={AdminExperiences} />
           <Route path="/admin/achievements" component={AdminAchievements} />
+          <Route path="/admin/comments" component={AdminComments} />
           <Route path="/project/:id" component={ProjectDetails} />
           <Route path="/experience/:id" component={ExperienceDetails} />
           <Route path="/achievement/:id" component={AchievementDetails} />

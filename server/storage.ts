@@ -54,6 +54,8 @@ export interface IStorage {
   getComments(itemType: string, itemId: string): Promise<(Comment & { user: User; replies: Comment[] })[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   deleteComment(id: string): Promise<void>;
+  getAllCommentsWithDetails(): Promise<(Comment & { user: User, itemTitle: string, itemType: string, repliesCount: number })[]>;
+  getRecentComments(limit: number): Promise<(Comment & { user: User, itemTitle?: string })[]>;
 
   // Like operations
   toggleLike(userId: string, itemType: string, itemId: string): Promise<{ liked: boolean; count: number }>;
@@ -313,6 +315,98 @@ export class DatabaseStorage implements IStorage {
 
   async deleteComment(id: string): Promise<void> {
     await db.delete(comments).where(eq(comments.id, id));
+  }
+
+  async getAllCommentsWithDetails(): Promise<(Comment & { user: User, itemTitle: string, itemType: string, repliesCount: number })[]> {
+    const commentsData = await db
+      .select({
+        comment: comments,
+        user: users,
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .where(sql`${comments.parentId} IS NULL`)
+      .orderBy(desc(comments.createdAt));
+
+    const result = [];
+    for (const row of commentsData) {
+      if (!row.user) continue;
+
+      // Get item title based on type
+      let itemTitle = 'Item não encontrado';
+      try {
+        if (row.comment.itemType === 'project') {
+          const [project] = await db.select({ title: projects.title }).from(projects).where(eq(projects.id, row.comment.itemId));
+          itemTitle = project?.title || 'Projeto não encontrado';
+        } else if (row.comment.itemType === 'achievement') {
+          const [achievement] = await db.select({ title: achievements.title }).from(achievements).where(eq(achievements.id, row.comment.itemId));
+          itemTitle = achievement?.title || 'Conquista não encontrada';
+        } else if (row.comment.itemType === 'experience') {
+          const [experience] = await db.select({ position: experiences.position }).from(experiences).where(eq(experiences.id, row.comment.itemId));
+          itemTitle = experience?.position || 'Experiência não encontrada';
+        }
+      } catch (error) {
+        console.error('Error getting item title:', error);
+      }
+
+      // Count replies
+      const repliesCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(comments)
+        .where(eq(comments.parentId, row.comment.id));
+
+      result.push({
+        ...row.comment,
+        user: row.user,
+        itemTitle,
+        itemType: row.comment.itemType,
+        repliesCount: Number(repliesCount[0]?.count || 0),
+      });
+    }
+
+    return result as any;
+  }
+
+  async getRecentComments(limit: number = 10): Promise<(Comment & { user: User, itemTitle?: string })[]> {
+    const commentsData = await db
+      .select({
+        comment: comments,
+        user: users,
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .orderBy(desc(comments.createdAt))
+      .limit(limit);
+
+    const result = [];
+    for (const row of commentsData) {
+      if (!row.user) continue;
+
+      // Get item title based on type (optional for recent comments)
+      let itemTitle: string | undefined;
+      try {
+        if (row.comment.itemType === 'project') {
+          const [project] = await db.select({ title: projects.title }).from(projects).where(eq(projects.id, row.comment.itemId));
+          itemTitle = project?.title;
+        } else if (row.comment.itemType === 'achievement') {
+          const [achievement] = await db.select({ title: achievements.title }).from(achievements).where(eq(achievements.id, row.comment.itemId));
+          itemTitle = achievement?.title;
+        } else if (row.comment.itemType === 'experience') {
+          const [experience] = await db.select({ position: experiences.position }).from(experiences).where(eq(experiences.id, row.comment.itemId));
+          itemTitle = experience?.position;
+        }
+      } catch (error) {
+        console.error('Error getting item title for recent comments:', error);
+      }
+
+      result.push({
+        ...row.comment,
+        user: row.user,
+        itemTitle,
+      });
+    }
+
+    return result as any;
   }
 
   async toggleLike(userId: string, itemType: string, itemId: string): Promise<{ liked: boolean; count: number }> {

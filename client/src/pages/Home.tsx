@@ -11,6 +11,7 @@ import ProjectModal from "@/components/ProjectModal";
 import ExperienceModal from "@/components/ExperienceModal";
 import AchievementModal from "@/components/AchievementModal";
 import CommentsModal from "@/components/CommentsModal";
+import RecentComments from "@/components/RecentComments";
 import { useState } from "react";
 
 export default function Home() {
@@ -54,6 +55,18 @@ export default function Home() {
       <ProjectsSection onOpenComments={openComments} />
       <ExperienceSection />
       <AchievementsSection onOpenComments={openComments} />
+      
+      {/* Recent Comments Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <RecentComments 
+            showAllComments={true}
+            title="Comentários Recentes do Portfólio"
+            limit={5}
+          />
+        </div>
+      </section>
+      
       <ContactSection />
       <Footer />
       

@@ -159,9 +159,8 @@ export default function AdminPanel({
       icon: MessageCircle,
       label: "Comentários",
       description: "Ver e gerenciar comentários",
-      onClick: onViewComments,
-      color: "text-slate-500",
-      badge: "3"
+      onClick: () => window.open('/admin/comments', '_blank'),
+      color: "text-slate-500"
     },
     {
       icon: BarChart,

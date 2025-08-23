@@ -299,6 +299,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin comments routes
+  app.get('/api/admin/comments', isAuthenticated, async (req, res) => {
+    try {
+      const comments = await storage.getAllCommentsWithDetails();
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching all comments:", error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  app.get('/api/admin/comments/recent', isAuthenticated, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const comments = await storage.getRecentComments(limit);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching recent comments:", error);
+      res.status(500).json({ message: "Failed to fetch recent comments" });
+    }
+  });
+
+  app.delete('/api/admin/comments/:id', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteComment(id);
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "Failed to delete comment" });
+    }
+  });
+
   // Likes routes
   app.post('/api/likes', isAuthenticated, async (req, res) => {
     try {
