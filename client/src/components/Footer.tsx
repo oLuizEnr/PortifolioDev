@@ -14,8 +14,8 @@ export default function Footer() {
   ];
 
   const socialLinks = [
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Github, href: "#", label: "GitHub" },
+    { icon: Linkedin, href: "https://www.linkedin.com/in/luiz-enrique-487b06300/", label: "LinkedIn" },
+    { icon: Github, href: "https://github.com/oLuizEnr", label: "GitHub" },
     { icon: Mail, href: "#", label: "Email" }
   ];
 

@@ -7,7 +7,7 @@ import sys
 import os
 
 # Add the project directory to Python path
-project_dir = '/home/yourusername/mysite'  # Update with your actual path on PythonAnywhere
+project_dir = '/home/yourusername/portfolio'  # Update 'yourusername' with your PythonAnywhere username
 if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
