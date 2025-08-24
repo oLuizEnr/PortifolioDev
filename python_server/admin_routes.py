@@ -39,6 +39,8 @@ def admin_routes(app):
             'featured': project.featured,
             'published': project.published,
             'linkedinPost': project.linkedin_post,
+            'linkedinPostUrl': project.linkedin_post_url,
+            'additionalImages': project.additional_images or [],
             'createdAt': project.created_at.isoformat() if project.created_at else None,
             'updatedAt': project.updated_at.isoformat() if project.updated_at else None
         }
@@ -53,6 +55,10 @@ def admin_routes(app):
             'description': experience.description,
             'technologies': experience.technologies or [],
             'published': experience.published,
+            'linkedinPost': experience.linkedin_post,
+            'linkedinPostUrl': experience.linkedin_post_url,
+            'companyLogoUrl': experience.company_logo_url,
+            'additionalImages': experience.additional_images or [],
             'createdAt': experience.created_at.isoformat() if experience.created_at else None,
             'updatedAt': experience.updated_at.isoformat() if experience.updated_at else None
         }
@@ -66,6 +72,10 @@ def admin_routes(app):
             'type': achievement.type,
             'certificateUrl': achievement.certificate_url,
             'published': achievement.published,
+            'linkedinPost': achievement.linkedin_post,
+            'linkedinPostUrl': achievement.linkedin_post_url,
+            'badgeImageUrl': achievement.badge_image_url,
+            'additionalImages': achievement.additional_images or [],
             'createdAt': achievement.created_at.isoformat() if achievement.created_at else None,
             'updatedAt': achievement.updated_at.isoformat() if achievement.updated_at else None
         }
@@ -98,6 +108,8 @@ def admin_routes(app):
             project.featured = data.get('featured', False)
             project.published = data.get('published', False)
             project.linkedin_post = data.get('linkedinPost')
+            project.linkedin_post_url = data.get('linkedinPostUrl')
+            project.additional_images = data.get('additionalImages', [])
             
             db.session.add(project)
             db.session.commit()
@@ -135,6 +147,10 @@ def admin_routes(app):
                 project.published = data['published']
             if 'linkedinPost' in data:
                 project.linkedin_post = data['linkedinPost']
+            if 'linkedinPostUrl' in data:
+                project.linkedin_post_url = data['linkedinPostUrl']
+            if 'additionalImages' in data:
+                project.additional_images = data['additionalImages']
             
             project.updated_at = datetime.utcnow()
             db.session.commit()
@@ -188,6 +204,10 @@ def admin_routes(app):
             experience.description = data.get('description')
             experience.technologies = data.get('technologies', [])
             experience.published = data.get('published', False)
+            experience.linkedin_post = data.get('linkedinPost')
+            experience.linkedin_post_url = data.get('linkedinPostUrl')
+            experience.company_logo_url = data.get('companyLogoUrl')
+            experience.additional_images = data.get('additionalImages', [])
             
             db.session.add(experience)
             db.session.commit()
@@ -221,6 +241,14 @@ def admin_routes(app):
                 experience.technologies = data['technologies']
             if 'published' in data:
                 experience.published = data['published']
+            if 'linkedinPost' in data:
+                experience.linkedin_post = data['linkedinPost']
+            if 'linkedinPostUrl' in data:
+                experience.linkedin_post_url = data['linkedinPostUrl']
+            if 'companyLogoUrl' in data:
+                experience.company_logo_url = data['companyLogoUrl']
+            if 'additionalImages' in data:
+                experience.additional_images = data['additionalImages']
             
             experience.updated_at = datetime.utcnow()
             db.session.commit()
@@ -272,6 +300,10 @@ def admin_routes(app):
             achievement.type = data.get('type')
             achievement.certificate_url = data.get('certificateUrl')
             achievement.published = data.get('published', False)
+            achievement.linkedin_post = data.get('linkedinPost')
+            achievement.linkedin_post_url = data.get('linkedinPostUrl')
+            achievement.badge_image_url = data.get('badgeImageUrl')
+            achievement.additional_images = data.get('additionalImages', [])
             
             db.session.add(achievement)
             db.session.commit()
@@ -303,6 +335,14 @@ def admin_routes(app):
                 achievement.certificate_url = data['certificateUrl']
             if 'published' in data:
                 achievement.published = data['published']
+            if 'linkedinPost' in data:
+                achievement.linkedin_post = data['linkedinPost']
+            if 'linkedinPostUrl' in data:
+                achievement.linkedin_post_url = data['linkedinPostUrl']
+            if 'badgeImageUrl' in data:
+                achievement.badge_image_url = data['badgeImageUrl']
+            if 'additionalImages' in data:
+                achievement.additional_images = data['additionalImages']
             
             achievement.updated_at = datetime.utcnow()
             db.session.commit()
@@ -335,6 +375,8 @@ def admin_routes(app):
             return jsonify([{
                 'id': c.id,
                 'userId': c.user_id,
+                'authorName': c.author_name,
+                'authorEmail': c.author_email,
                 'itemType': c.item_type,
                 'itemId': c.item_id,
                 'content': c.content,
@@ -346,14 +388,22 @@ def admin_routes(app):
             return jsonify({'message': 'Failed to fetch comments'}), 500
 
     @app.route('/api/comments', methods=['POST'])
-    @login_required
     def create_comment():
         try:
             data = request.get_json()
-            user_id = session['user_id']
             
             comment = Comment()
-            comment.user_id = user_id
+            
+            # If user is logged in, use their info
+            if 'user_id' in session:
+                comment.user_id = session['user_id']
+            else:
+                # Anonymous comment - require name and email
+                if not data.get('authorName') or not data.get('authorEmail'):
+                    return jsonify({'message': 'Nome e email são obrigatórios para comentários anônimos'}), 400
+                comment.author_name = data.get('authorName')
+                comment.author_email = data.get('authorEmail')
+            
             comment.item_type = data.get('itemType')
             comment.item_id = data.get('itemId')
             comment.content = data.get('content')
@@ -365,6 +415,8 @@ def admin_routes(app):
             return jsonify({
                 'id': comment.id,
                 'userId': comment.user_id,
+                'authorName': comment.author_name,
+                'authorEmail': comment.author_email,
                 'itemType': comment.item_type,
                 'itemId': comment.item_id,
                 'content': comment.content,
@@ -433,6 +485,96 @@ def admin_routes(app):
             })
         except Exception as e:
             return jsonify({'message': 'Failed to fetch likes'}), 500
+
+    # Admin Comments Routes
+    @app.route('/api/admin/comments', methods=['GET'])
+    @login_required
+    def get_all_comments():
+        try:
+            comments = Comment.query.order_by(Comment.created_at.desc()).all()
+            result = []
+            
+            for comment in comments:
+                comment_data = {
+                    'id': comment.id,
+                    'userId': comment.user_id,
+                    'authorName': comment.author_name,
+                    'authorEmail': comment.author_email,
+                    'itemType': comment.item_type,
+                    'itemId': comment.item_id,
+                    'content': comment.content,
+                    'parentId': comment.parent_id,
+                    'createdAt': comment.created_at.isoformat() if comment.created_at else None,
+                    'updatedAt': comment.updated_at.isoformat() if comment.updated_at else None
+                }
+                
+                # Add user info if available
+                if comment.user_id:
+                    user = User.query.get(comment.user_id)
+                    if user:
+                        comment_data['userInfo'] = {
+                            'firstName': user.first_name,
+                            'lastName': user.last_name,
+                            'email': user.email
+                        }
+                
+                result.append(comment_data)
+            
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({'message': 'Failed to fetch comments'}), 500
+
+    @app.route('/api/admin/comments/recent', methods=['GET'])
+    @login_required
+    def get_recent_comments():
+        try:
+            limit = int(request.args.get('limit', 10))
+            comments = Comment.query.order_by(Comment.created_at.desc()).limit(limit).all()
+            
+            result = []
+            for comment in comments:
+                comment_data = {
+                    'id': comment.id,
+                    'userId': comment.user_id,
+                    'authorName': comment.author_name,
+                    'authorEmail': comment.author_email,
+                    'itemType': comment.item_type,
+                    'itemId': comment.item_id,
+                    'content': comment.content,
+                    'parentId': comment.parent_id,
+                    'createdAt': comment.created_at.isoformat() if comment.created_at else None
+                }
+                
+                # Add user info if available
+                if comment.user_id:
+                    user = User.query.get(comment.user_id)
+                    if user:
+                        comment_data['userInfo'] = {
+                            'firstName': user.first_name,
+                            'lastName': user.last_name,
+                            'email': user.email
+                        }
+                
+                result.append(comment_data)
+            
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({'message': 'Failed to fetch recent comments'}), 500
+
+    @app.route('/api/admin/comments/<comment_id>', methods=['DELETE'])
+    @login_required
+    def delete_comment(comment_id):
+        try:
+            comment = Comment.query.get(comment_id)
+            if not comment:
+                return jsonify({'message': 'Comment not found'}), 404
+            
+            db.session.delete(comment)
+            db.session.commit()
+            
+            return jsonify({'message': 'Comment deleted successfully'})
+        except Exception as e:
+            return jsonify({'message': 'Failed to delete comment'}), 500
 
     # Admin Profile Routes
     @app.route('/api/admin/profile', methods=['PUT'])

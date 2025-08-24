@@ -87,6 +87,8 @@ def project_to_dict(project: Project):
         'featured': project.featured,
         'published': project.published,
         'linkedinPost': project.linkedin_post,
+        'linkedinPostUrl': project.linkedin_post_url,
+        'additionalImages': project.additional_images or [],
         'createdAt': project.created_at.isoformat() if project.created_at else None,
         'updatedAt': project.updated_at.isoformat() if project.updated_at else None
     }
@@ -101,6 +103,10 @@ def experience_to_dict(experience: Experience):
         'description': experience.description,
         'technologies': experience.technologies or [],
         'published': experience.published,
+        'linkedinPost': experience.linkedin_post,
+        'linkedinPostUrl': experience.linkedin_post_url,
+        'companyLogoUrl': experience.company_logo_url,
+        'additionalImages': experience.additional_images or [],
         'createdAt': experience.created_at.isoformat() if experience.created_at else None,
         'updatedAt': experience.updated_at.isoformat() if experience.updated_at else None
     }
@@ -114,6 +120,10 @@ def achievement_to_dict(achievement: Achievement):
         'type': achievement.type,
         'certificateUrl': achievement.certificate_url,
         'published': achievement.published,
+        'linkedinPost': achievement.linkedin_post,
+        'linkedinPostUrl': achievement.linkedin_post_url,
+        'badgeImageUrl': achievement.badge_image_url,
+        'additionalImages': achievement.additional_images or [],
         'createdAt': achievement.created_at.isoformat() if achievement.created_at else None,
         'updatedAt': achievement.updated_at.isoformat() if achievement.updated_at else None
     }
@@ -122,6 +132,8 @@ def comment_to_dict(comment: Comment):
     return {
         'id': comment.id,
         'userId': comment.user_id,
+        'authorName': comment.author_name,
+        'authorEmail': comment.author_email,
         'itemType': comment.item_type,
         'itemId': comment.item_id,
         'content': comment.content,
@@ -255,6 +267,52 @@ def contact():
 # Import and register admin routes
 from admin_routes import admin_routes
 admin_routes(app)
+
+# File upload routes
+from upload_service import UploadService
+
+@app.route('/api/upload', methods=['POST'])
+@login_required
+@admin_required
+def upload_file():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'message': 'No file part'}), 400
+        
+        file = request.files['file']
+        user_id = session['user_id']
+        
+        file_info = UploadService.save_file(file, user_id)
+        return jsonify(file_info)
+        
+    except ValueError as e:
+        return jsonify({'message': str(e)}), 400
+    except Exception as e:
+        return jsonify({'message': 'Failed to upload file'}), 500
+
+@app.route('/api/files/<file_id>', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_file(file_id):
+    try:
+        success = UploadService.delete_file(file_id)
+        if success:
+            return jsonify({'message': 'File deleted successfully'})
+        else:
+            return jsonify({'message': 'File not found'}), 404
+    except Exception as e:
+        return jsonify({'message': 'Failed to delete file'}), 500
+
+@app.route('/api/files/<file_id>', methods=['GET'])
+def get_file_info(file_id):
+    try:
+        file_info = UploadService.get_file_info(file_id)
+        if file_info:
+            return jsonify(file_info)
+        else:
+            return jsonify({'message': 'File not found'}), 404
+    except Exception as e:
+        return jsonify({'message': 'Failed to get file info'}), 500
 
 # Serve uploaded files
 @app.route('/uploads/<filename>')

@@ -40,6 +40,8 @@ class Project(db.Model):
     featured = db.Column(db.Boolean, default=False)
     published = db.Column(db.Boolean, default=False)
     linkedin_post = db.Column(db.Text)
+    linkedin_post_url = db.Column(db.String(500))  # URL do post no LinkedIn
+    additional_images = db.Column(db.JSON)  # Array de URLs de imagens adicionais
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -55,6 +57,10 @@ class Experience(db.Model):
     description = db.Column(db.Text, nullable=False)
     technologies = db.Column(db.JSON)
     published = db.Column(db.Boolean, default=False)
+    linkedin_post = db.Column(db.Text)
+    linkedin_post_url = db.Column(db.String(500))  # URL do post no LinkedIn
+    company_logo_url = db.Column(db.String(500))  # Logo da empresa
+    additional_images = db.Column(db.JSON)  # Array de URLs de imagens adicionais
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -69,6 +75,10 @@ class Achievement(db.Model):
     type = db.Column(db.String(50), nullable=False)  # certification, award, speaking, etc
     certificate_url = db.Column(db.String(500))
     published = db.Column(db.Boolean, default=False)
+    linkedin_post = db.Column(db.Text)
+    linkedin_post_url = db.Column(db.String(500))  # URL do post no LinkedIn
+    badge_image_url = db.Column(db.String(500))  # Imagem do badge/certificado
+    additional_images = db.Column(db.JSON)  # Array de URLs de imagens adicionais
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -87,7 +97,9 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)  # Allow anonymous comments
+    author_name = db.Column(db.String(100))  # For anonymous comments
+    author_email = db.Column(db.String(255))  # For anonymous comments
     item_type = db.Column(db.String(50), nullable=False)  # project, achievement
     item_id = db.Column(db.String(36), nullable=False)
     content = db.Column(db.Text, nullable=False)
