@@ -10,8 +10,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("admin@portfolio.dev");
-  const [password, setPassword] = useState("Admin123!");
+  const [email, setEmail] = useState("admin@example.com");
+  const [password, setPassword] = useState("admin123");
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
@@ -98,9 +98,9 @@ export default function Login() {
             <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
               <strong>Credenciais padrão:</strong>
               <br />
-              Email: admin@portfolio.dev
+              Email: admin@example.com
               <br />
-              Senha: Admin123!
+              Senha: admin123
             </p>
           </div>
         </CardContent>
