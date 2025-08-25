@@ -94,7 +94,7 @@ class UploadService:
         return True
     
     @staticmethod
-    def get_file_info(file_id: str) -> dict:
+    def get_file_info(file_id: str) -> dict | None:
         """Get file information"""
         file_record = File.query.get(file_id)
         if not file_record:

@@ -11,8 +11,12 @@ project_dir = '/home/yourusername/portfolio'  # Update 'yourusername' with your 
 if project_dir not in sys.path:
     sys.path.insert(0, project_dir)
 
-# Change to the project directory (not python_server subdirectory)
+# Change to the project directory
 os.chdir(project_dir)
+
+# Ensure sessions directory exists
+os.makedirs('sessions', exist_ok=True)
+os.makedirs('static', exist_ok=True)
 
 from app import app as application
 

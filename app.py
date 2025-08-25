@@ -12,14 +12,19 @@ import json
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///portfolio.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Session configuration optimized for PythonAnywhere
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = './sessions'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'portfolio:'
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -33,6 +38,19 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 with app.app_context():
     db.create_all()
+    
+    # Create default admin user if none exists
+    admin = User.query.filter_by(is_admin=True).first()
+    if not admin:
+        admin = User()
+        admin.email = 'admin@example.com'
+        admin.password = 'admin123'  
+        admin.first_name = 'Admin'
+        admin.last_name = 'User'
+        admin.is_admin = True
+        db.session.add(admin)
+        db.session.commit()
+        print("Created default admin user: admin@example.com / admin123")
 
 # Auth decorator
 def login_required(f):
@@ -330,20 +348,5 @@ def serve_frontend(path):
         return send_from_directory("dist/public", "index.html")
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        
-        # Create default admin user if none exists
-        admin = User.query.filter_by(is_admin=True).first()
-        if not admin:
-            admin = User()
-            admin.email = 'admin@example.com'
-            admin.password = 'admin123'  # Change this in production
-            admin.first_name = 'Admin'
-            admin.last_name = 'User'
-            admin.is_admin = True
-            db.session.add(admin)
-            db.session.commit()
-            print("Created default admin user: admin@example.com / admin123")
-    
+    # Database initialization (already done at app startup)
     app.run(host='0.0.0.0', port=5000, debug=True)
