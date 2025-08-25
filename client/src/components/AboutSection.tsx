@@ -1,6 +1,21 @@
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import EditableText from "./EditableText";
+import { useContent } from "@/hooks/useContent";
 
 export default function AboutSection() {
+  const { data: content } = useQuery({
+    queryKey: ['/api/content'],
+    staleTime: 0,
+  });
+  const { updateContent } = useContent();
+
+  // Editable content with defaults
+  const aboutTitle = content?.about?.title || "Sobre Mim";
+  const aboutSubtitle = content?.about?.subtitle || "Conheça mais sobre minha jornada e paixão pelo desenvolvimento";
+  const aboutDescription1 = content?.about?.description1 || "Sou um desenvolvedor full stack com mais de 5 anos de experiência criando aplicações web modernas e escaláveis. Minha paixão está em transformar ideias complexas em soluções digitais elegantes e funcionais.";
+  const aboutDescription2 = content?.about?.description2 || "Baseado em Poá, SP, trabalho com as mais recentes tecnologias do mercado, sempre focando na experiência do usuário e na qualidade do código. Acredito que a tecnologia deve simplificar a vida das pessoas.";
+
   const stats = [
     { value: "5+", label: "Anos de Experiência", color: "bg-primary/5 text-primary" },
     { value: "50+", label: "Projetos Concluídos", color: "bg-emerald-50 text-emerald-600" },
@@ -19,26 +34,48 @@ export default function AboutSection() {
     <section id="about" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4" data-testid="text-about-title">
-            Sobre Mim
-          </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Conheça mais sobre minha jornada e paixão pelo desenvolvimento
-          </p>
+          <EditableText
+            content={aboutTitle}
+            onSave={async (newContent) => {
+              await updateContent({ section: 'about', field: 'title', content: newContent });
+            }}
+            tag="h2"
+            className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4"
+            placeholder="Título da seção sobre..."
+          />
+          <EditableText
+            content={aboutSubtitle}
+            onSave={async (newContent) => {
+              await updateContent({ section: 'about', field: 'subtitle', content: newContent });
+            }}
+            tag="p"
+            className="text-lg text-slate-600 max-w-2xl mx-auto"
+            placeholder="Subtítulo da seção sobre..."
+          />
         </div>
         
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-lg text-slate-700 mb-6 leading-relaxed" data-testid="text-about-description">
-              Sou um desenvolvedor full stack com mais de 5 anos de experiência criando 
-              aplicações web modernas e escaláveis. Minha paixão está em transformar 
-              ideias complexas em soluções digitais elegantes e funcionais.
-            </p>
-            <p className="text-lg text-slate-700 mb-8 leading-relaxed">
-              Baseado em Poá, SP, trabalho com as mais recentes tecnologias do mercado, 
-              sempre focando na experiência do usuário e na qualidade do código. 
-              Acredito que a tecnologia deve simplificar a vida das pessoas.
-            </p>
+            <EditableText
+              content={aboutDescription1}
+              onSave={async (newContent) => {
+                await updateContent({ section: 'about', field: 'description1', content: newContent });
+              }}
+              tag="p"
+              className="text-lg text-slate-700 mb-6 leading-relaxed"
+              multiline
+              placeholder="Primeiro parágrafo sobre você..."
+            />
+            <EditableText
+              content={aboutDescription2}
+              onSave={async (newContent) => {
+                await updateContent({ section: 'about', field: 'description2', content: newContent });
+              }}
+              tag="p"
+              className="text-lg text-slate-700 mb-8 leading-relaxed"
+              multiline
+              placeholder="Segundo parágrafo sobre você..."
+            />
             
             {/* Skills */}
             <div className="space-y-4">

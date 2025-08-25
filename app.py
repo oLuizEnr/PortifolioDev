@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
 from flask_session import Session
 from werkzeug.utils import secure_filename
-from models import db, User, Project, Experience, Achievement, Like, Comment, File
+from models import db, User, Project, Experience, Achievement, Like, Comment, File, Content
 from datetime import datetime, timedelta
 import os
 import uuid
@@ -281,6 +281,94 @@ def contact():
         return jsonify({'message': 'Message sent successfully'})
     except Exception as e:
         return jsonify({'message': 'Failed to send message'}), 500
+
+# Content management routes
+@app.route('/api/content', methods=['POST'])
+@login_required
+@admin_required
+def update_content():
+    try:
+        data = request.get_json()
+        section = data.get('section')
+        field = data.get('field')
+        content = data.get('content')
+        
+        if not all([section, field, content]):
+            return jsonify({'message': 'Section, field and content are required'}), 400
+        
+        # Check if content record exists
+        existing_content = Content.query.filter_by(section=section, field=field).first()
+        
+        if existing_content:
+            existing_content.content = content
+        else:
+            new_content = Content(section=section, field=field, content=content)
+            db.session.add(new_content)
+        
+        db.session.commit()
+        return jsonify({'message': 'Content updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Failed to update content'}), 500
+
+@app.route('/api/content', methods=['GET'])
+def get_content():
+    try:
+        content_items = Content.query.all()
+        content_dict = {}
+        
+        for item in content_items:
+            if item.section not in content_dict:
+                content_dict[item.section] = {}
+            content_dict[item.section][item.field] = item.content
+            
+        return jsonify(content_dict)
+        
+    except Exception as e:
+        return jsonify({'message': 'Failed to get content'}), 500
+
+@app.route('/api/content/image', methods=['POST'])
+@login_required
+@admin_required
+def update_image():
+    try:
+        data = request.get_json()
+        section = data.get('section')
+        field = data.get('field') 
+        image_url = data.get('imageUrl')
+        
+        if not all([section, field, image_url]):
+            return jsonify({'message': 'Section, field and imageUrl are required'}), 400
+        
+        # Special handling for profile images
+        if section == 'profile':
+            user = User.query.get(session['user_id'])
+            if user:
+                if field == 'profileImage':
+                    user.profile_image_url = image_url
+                elif field == 'heroImage':
+                    user.hero_image_url = image_url
+                db.session.commit()
+                return jsonify({'message': 'Profile image updated successfully'})
+            else:
+                return jsonify({'message': 'User not found'}), 404
+        
+        # Check if content record exists
+        existing_content = Content.query.filter_by(section=section, field=field).first()
+        
+        if existing_content:
+            existing_content.content = image_url
+        else:
+            new_content = Content(section=section, field=field, content=image_url)
+            db.session.add(new_content)
+        
+        db.session.commit()
+        return jsonify({'message': 'Image updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Failed to update image'}), 500
 
 # Import and register admin routes
 from admin_routes import admin_routes

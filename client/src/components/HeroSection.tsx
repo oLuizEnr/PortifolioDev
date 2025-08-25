@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Download, Github, Linkedin, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import EditableText from "./EditableText";
+import EditableImage from "./EditableImage";
+import { useContent } from "@/hooks/useContent";
 
 interface ProfileData {
   firstName: string;
@@ -17,10 +20,20 @@ export default function HeroSection() {
     queryKey: ['/api/profile'],
     staleTime: 0, // No cache to update immediately
   });
+  const { data: content } = useQuery({
+    queryKey: ['/api/content'],
+    staleTime: 0,
+  });
+  const { updateContent, updateImage } = useContent();
 
   // Default values
   const name = profile ? `${profile.firstName || 'Admin'} ${profile.lastName || 'Portfolio'}` : 'Seu Nome';
   const heroImage = profile?.heroImageUrl || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+  
+  // Editable content with defaults
+  const heroTitle = content?.hero?.title || "Desenvolvedor Full Stack apaixonado por criar soluções digitais inovadoras.";
+  const heroDescription = content?.hero?.description || "Especializado em React, Node.js e tecnologias modernas de desenvolvimento web.";
+  const heroLocation = content?.hero?.location || "Poá, SP";
   const scrollToProjects = () => {
     document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -38,17 +51,36 @@ export default function HeroSection() {
             <div className="flex items-center mb-4">
               <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
                 <MapPin className="w-3 h-3 mr-1" />
-                Poá, SP
+                <EditableText
+                  content={heroLocation}
+                  onSave={async (newContent) => {
+                    await updateContent({ section: 'hero', field: 'location', content: newContent });
+                  }}
+                  tag="span"
+                  className="inline"
+                  placeholder="Sua localização..."
+                />
               </Badge>
             </div>
-            <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6" data-testid="text-hero-title">
-              Olá, eu sou{" "}
-              <span className="text-primary">{name}</span>
-            </h1>
-            <p className="text-xl text-slate-600 mb-8 leading-relaxed" data-testid="text-hero-description">
-              Desenvolvedor Full Stack apaixonado por criar soluções digitais inovadoras. 
-              Especializado em React, Node.js e tecnologias modernas de desenvolvimento web.
-            </p>
+            <EditableText
+              content={`Olá, eu sou ${name}`}
+              onSave={async (newContent) => {
+                await updateContent({ section: 'hero', field: 'greeting', content: newContent });
+              }}
+              tag="h1"
+              className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6"
+              placeholder="Digite sua saudação..."
+            />
+            <EditableText
+              content={heroTitle}
+              onSave={async (newContent) => {
+                await updateContent({ section: 'hero', field: 'title', content: newContent });
+              }}
+              tag="p"
+              className="text-xl text-slate-600 mb-8 leading-relaxed"
+              multiline
+              placeholder="Descreva sua especialização..."
+            />
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 onClick={scrollToProjects}
@@ -103,12 +135,14 @@ export default function HeroSection() {
           </div>
           
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
-            <img 
-              src={heroImage} 
-              alt={`${name} - Desenvolvedor Full Stack`} 
+            <EditableImage
+              src={heroImage}
+              alt={`${name} - Desenvolvedor Full Stack`}
+              onSave={async (newImageUrl) => {
+                await updateImage({ section: 'profile', field: 'heroImage', imageUrl: newImageUrl });
+              }}
               className="w-80 h-80 rounded-2xl shadow-2xl object-cover"
-              data-testid="img-profile"
-              loading="lazy"
+              aspectRatio="square"
             />
           </div>
         </div>

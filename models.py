@@ -122,4 +122,28 @@ class File(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Content(db.Model):
+    __tablename__ = 'content'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    section = db.Column(db.String(100), nullable=False)
+    field = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Ensure unique combination of section and field
+    __table_args__ = (db.UniqueConstraint('section', 'field', name='unique_section_field'),)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'section': self.section,
+            'field': self.field,
+            'content': self.content,
+            'createdAt': self.created_at.isoformat(),
+            'updatedAt': self.updated_at.isoformat()
+        }
+
+
 # Session table is handled automatically by Flask-Session
