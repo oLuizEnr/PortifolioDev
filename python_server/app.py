@@ -12,8 +12,8 @@ import json
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this in production
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///portfolio.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///portfolio.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = './sessions'
@@ -323,10 +323,18 @@ def uploaded_file(filename):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):
-    if path != "" and os.path.exists("client/dist/" + path):
-        return send_from_directory("client/dist", path)
+    # Check for built frontend in dist/public first, then fallback to client/dist
+    dist_public_path = os.path.join("../dist/public", path) if path else "../dist/public/index.html"
+    client_dist_path = os.path.join("../client/dist", path) if path else "../client/dist/index.html"
+    
+    if path and os.path.exists(os.path.join(os.path.dirname(__file__), dist_public_path)):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), "../dist/public"), path)
+    elif path and os.path.exists(os.path.join(os.path.dirname(__file__), client_dist_path)):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), "../client/dist"), path)
+    elif os.path.exists(os.path.join(os.path.dirname(__file__), "../dist/public/index.html")):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), "../dist/public"), "index.html")
     else:
-        return send_from_directory("client/dist", "index.html")
+        return send_from_directory(os.path.join(os.path.dirname(__file__), "../client/dist"), "index.html")
 
 if __name__ == '__main__':
     with app.app_context():

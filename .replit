@@ -1,14 +1,14 @@
-modules = ["nodejs-20", "web", "python-3.11"]
+modules = ["nodejs-20", "python-3.11", "web"]
 run = "npm run dev"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["libxcrypt"]
+packages = ["libxcrypt", "openssl", "postgresql"]
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["npm", "run", "start"]
+run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
 build = ["npm", "run", "build"]
 
 [[ports]]
@@ -36,8 +36,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 waitForPort = 5000
 
 [agent]
-integrations = ["javascript_mem_db==1.0.0"]
