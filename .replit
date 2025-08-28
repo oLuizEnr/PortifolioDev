@@ -9,7 +9,6 @@ packages = ["libxcrypt", "openssl", "postgresql"]
 [deployment]
 deploymentTarget = "autoscale"
 run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
-build = ["npm", "run", "build"]
 
 [[ports]]
 localPort = 5000
