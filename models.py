@@ -135,6 +135,11 @@ class Content(db.Model):
     # Ensure unique combination of section and field
     __table_args__ = (db.UniqueConstraint('section', 'field', name='unique_section_field'),)
 
+    def __init__(self, section=None, field=None, content=None):
+        self.section = section
+        self.field = field
+        self.content = content
+
     def to_dict(self):
         return {
             'id': self.id,
