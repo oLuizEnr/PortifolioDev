@@ -19,6 +19,7 @@ import AchievementDetails from "@/pages/AchievementDetails";
 import AllProjects from "@/pages/AllProjects";
 import AllExperiences from "@/pages/AllExperiences";
 import AllAchievements from "@/pages/AllAchievements";
+import AllComments from "@/pages/AllComments";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -35,6 +36,7 @@ function Router() {
           <Route path="/projects" component={AllProjects} />
           <Route path="/experiences" component={AllExperiences} />
           <Route path="/achievements" component={AllAchievements} />
+          <Route path="/comments" component={AllComments} />
         </>
       ) : (
         <>
@@ -50,6 +52,7 @@ function Router() {
           <Route path="/projects" component={AllProjects} />
           <Route path="/experiences" component={AllExperiences} />
           <Route path="/achievements" component={AllAchievements} />
+          <Route path="/comments" component={AllComments} />
         </>
       )}
       <Route component={NotFound} />

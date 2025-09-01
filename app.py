@@ -262,6 +262,50 @@ def register_routes(app):
         except Exception as e:
             return jsonify({'message': 'Failed to fetch achievements'}), 500
 
+    # Contact comments routes
+    @app.route('/api/contact/comments', methods=['GET'])
+    def get_contact_comments():
+        try:
+            limit = int(request.args.get('limit', 5))
+            comments = Comment.query.filter_by(item_type='contact').order_by(Comment.created_at.desc()).limit(limit).all()
+            
+            formatted_comments = []
+            for comment in comments:
+                formatted_comment = comment_to_dict(comment)
+                # Add user info for anonymous comments
+                formatted_comment['user'] = {
+                    'firstName': comment.author_name.split(' ')[0] if comment.author_name else 'Anônimo',
+                    'lastName': ' '.join(comment.author_name.split(' ')[1:]) if comment.author_name and len(comment.author_name.split(' ')) > 1 else '',
+                    'email': comment.author_email
+                }
+                formatted_comments.append(formatted_comment)
+            
+            return jsonify(formatted_comments)
+        except Exception as e:
+            print(f"Error fetching contact comments: {e}")
+            return jsonify({'message': 'Failed to fetch comments'}), 500
+
+    @app.route('/api/contact/comments/all', methods=['GET'])
+    def get_all_contact_comments():
+        try:
+            comments = Comment.query.filter_by(item_type='contact').order_by(Comment.created_at.desc()).all()
+            
+            formatted_comments = []
+            for comment in comments:
+                formatted_comment = comment_to_dict(comment)
+                # Add user info for anonymous comments
+                formatted_comment['user'] = {
+                    'firstName': comment.author_name.split(' ')[0] if comment.author_name else 'Anônimo',
+                    'lastName': ' '.join(comment.author_name.split(' ')[1:]) if comment.author_name and len(comment.author_name.split(' ')) > 1 else '',
+                    'email': comment.author_email
+                }
+                formatted_comments.append(formatted_comment)
+            
+            return jsonify(formatted_comments)
+        except Exception as e:
+            print(f"Error fetching all contact comments: {e}")
+            return jsonify({'message': 'Failed to fetch all comments'}), 500
+
     # Contact form
     @app.route('/api/contact', methods=['POST'])
     def contact():
@@ -275,11 +319,24 @@ def register_routes(app):
             if not all([name, email, subject, message]):
                 return jsonify({'message': 'All fields are required'}), 400
             
+            # Create comment for contact form submission
+            comment = Comment(
+                author_name=name,
+                author_email=email,
+                item_type='contact',
+                item_id='general',
+                content=f"**Assunto:** {subject}\n\n{message}"
+            )
+            
+            db.session.add(comment)
+            db.session.commit()
+            
             # Log the contact form submission
             print(f"Contact form submission: {name} ({email}) - {subject}: {message}")
             
             return jsonify({'message': 'Message sent successfully'})
         except Exception as e:
+            print(f"Error saving contact comment: {e}")
             return jsonify({'message': 'Failed to send message'}), 500
 
     # Content management routes
