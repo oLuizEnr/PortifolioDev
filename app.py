@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
+import locale
 from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
 from flask_session import Session
@@ -11,9 +13,14 @@ import uuid
 from typing import Optional, List
 import json
 
-# Force UTF-8 encoding
-if hasattr(sys, '_getframe'):
+# Force UTF-8 encoding for the entire environment
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+# Force UTF-8 encoding for stdout/stderr
+if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
 def create_app(config_name=None):
@@ -31,6 +38,7 @@ def create_app(config_name=None):
     # Force UTF-8 for JSON
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    app.config['JSON_SORT_KEYS'] = False
     
     # Initialize extensions
     db.init_app(app)
@@ -360,9 +368,16 @@ def register_routes(app):
     @admin_required
     def update_content():
         try:
-            data = request.get_json()
-            if not data:
+            # Get raw data and decode properly
+            raw_data = request.get_data(as_text=True)
+            if not raw_data:
                 return jsonify({'message': 'No JSON data provided'}), 400
+            
+            # Parse JSON with proper UTF-8 handling
+            try:
+                data = json.loads(raw_data.encode('utf-8').decode('utf-8'))
+            except:
+                data = request.get_json(force=True)
                 
             section = data.get('section')
             field = data.get('field')
@@ -370,6 +385,11 @@ def register_routes(app):
             
             if not all([section, field, content]):
                 return jsonify({'message': 'Section, field and content are required'}), 400
+            
+            # Ensure all text data is properly handled as UTF-8
+            section = str(section).strip()
+            field = str(field).strip()
+            content = str(content).strip()
             
             # Check if content record exists
             existing_content = Content.query.filter_by(section=section, field=field).first()
@@ -386,7 +406,11 @@ def register_routes(app):
             
         except Exception as e:
             db.session.rollback()
-            error_msg = str(e)
+            # Handle UTF-8 encoding in error messages
+            try:
+                error_msg = str(e).encode('utf-8').decode('utf-8')
+            except:
+                error_msg = "Encoding error occurred"
             print(f"Error updating content: {error_msg}")
             # Ensure we return UTF-8 encoded JSON
             response = jsonify({'message': f'Failed to update content: {error_msg}'})
