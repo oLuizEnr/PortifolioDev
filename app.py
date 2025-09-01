@@ -345,6 +345,9 @@ def register_routes(app):
     def update_content():
         try:
             data = request.get_json()
+            if not data:
+                return jsonify({'message': 'No JSON data provided'}), 400
+                
             section = data.get('section')
             field = data.get('field')
             content = data.get('content')
@@ -357,6 +360,7 @@ def register_routes(app):
             
             if existing_content:
                 existing_content.content = content
+                existing_content.updated_at = datetime.utcnow()
             else:
                 new_content = Content(section=section, field=field, content=content)
                 db.session.add(new_content)
@@ -366,7 +370,8 @@ def register_routes(app):
             
         except Exception as e:
             db.session.rollback()
-            return jsonify({'message': 'Failed to update content'}), 500
+            print(f"Error updating content: {str(e)}")
+            return jsonify({'message': f'Failed to update content: {str(e)}'}), 500
 
     @app.route('/api/content', methods=['GET'])
     def get_content():
