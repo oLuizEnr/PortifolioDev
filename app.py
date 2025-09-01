@@ -320,13 +320,12 @@ def register_routes(app):
                 return jsonify({'message': 'All fields are required'}), 400
             
             # Create comment for contact form submission
-            comment = Comment(
-                author_name=name,
-                author_email=email,
-                item_type='contact',
-                item_id='general',
-                content=f"**Assunto:** {subject}\n\n{message}"
-            )
+            comment = Comment()
+            comment.author_name = name
+            comment.author_email = email
+            comment.item_type = 'contact'
+            comment.item_id = 'general'
+            comment.content = f"**Assunto:** {subject}\n\n{message}"
             
             db.session.add(comment)
             db.session.commit()

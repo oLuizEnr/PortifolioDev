@@ -36,7 +36,9 @@ export default function AllComments() {
   };
 
   const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    const first = firstName?.charAt(0) || 'U';
+    const last = lastName?.charAt(0) || 'U';
+    return `${first}${last}`.toUpperCase();
   };
 
   const extractSubject = (content: string) => {
@@ -138,17 +140,17 @@ export default function AllComments() {
                   <div className="flex items-start space-x-4">
                     <Avatar className="w-10 h-10">
                       <AvatarFallback className="text-sm bg-primary/10 text-primary">
-                        {getInitials(comment.user.firstName, comment.user.lastName)}
+                        {getInitials(comment.user?.firstName || 'U', comment.user?.lastName || 'U')}
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="font-semibold text-slate-800">
-                          {comment.user.firstName} {comment.user.lastName}
+                          {comment.user?.firstName || 'Usuário'} {comment.user?.lastName || ''}
                         </h3>
                         <span className="text-sm text-slate-500">
-                          {comment.user.email}
+                          {comment.user?.email || 'Sem email'}
                         </span>
                         <span className="text-sm text-slate-400">
                           {formatDate(comment.createdAt)}

@@ -40,7 +40,9 @@ export default function ContactComments({ limit = 5, showHeader = true }: Contac
   };
 
   const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    const first = firstName?.charAt(0) || 'U';
+    const last = lastName?.charAt(0) || 'U';
+    return `${first}${last}`.toUpperCase();
   };
 
   const extractSubject = (content: string) => {
@@ -128,14 +130,14 @@ export default function ContactComments({ limit = 5, showHeader = true }: Contac
             >
               <Avatar className="w-8 h-8">
                 <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                  {getInitials(comment.user.firstName, comment.user.lastName)}
+                  {getInitials(comment.user?.firstName || 'U', comment.user?.lastName || 'U')}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">
                   <span className="font-medium text-slate-800 text-sm">
-                    {comment.user.firstName} {comment.user.lastName}
+                    {comment.user?.firstName || 'Usuário'} {comment.user?.lastName || ''}
                   </span>
                   <span className="text-xs text-slate-500">
                     {formatDate(comment.createdAt)}
