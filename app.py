@@ -381,32 +381,25 @@ def register_routes(app):
     @admin_required
     def update_content():
         try:
-            # Get raw data and decode properly
-            raw_data = request.get_data(as_text=True)
-            if not raw_data:
+            # Get JSON data directly - Flask handles UTF-8 properly
+            data = request.get_json()
+            if not data:
                 return jsonify({'message': 'No JSON data provided'}), 400
-            
-            # Parse JSON with proper UTF-8 handling
-            try:
-                data = json.loads(raw_data)
-            except:
-                data = request.get_json(force=True)
                 
             section = data.get('section')
             field = data.get('field')
             content = data.get('content')
             
-            if not all([section, field, content]):
-                return jsonify({'message': 'Section, field and content are required'}), 400
+            if not all([section, field]):
+                return jsonify({'message': 'Section and field are required'}), 400
             
-            # Ensure all text data is properly handled as UTF-8 strings
-            section = str(section).strip() if section else ''
-            field = str(field).strip() if field else ''
-            content = str(content).strip() if content else ''
+            if content is None:
+                return jsonify({'message': 'Content is required'}), 400
             
-            # Validate that content is not empty after stripping
-            if not content:
-                return jsonify({'message': 'Content cannot be empty'}), 400
+            # Handle content properly - don't strip if it's an empty string by design
+            content = str(content) if content is not None else ''
+            section = str(section).strip()
+            field = str(field).strip()
             
             # Check if content record exists
             existing_content = Content.query.filter_by(section=section, field=field).first()
@@ -423,22 +416,13 @@ def register_routes(app):
             
         except Exception as e:
             db.session.rollback()
-            # Handle UTF-8 encoding in error messages with safe handling
-            try:
-                error_msg = repr(e)  # Use repr instead of str to avoid encoding issues
-            except:
-                error_msg = "Database error occurred"
+            # Log error safely without causing encoding issues
+            import traceback
+            # Just log that an error occurred, not the content to avoid encoding issues
+            app.logger.error(f"Failed to update content for section={data.get('section', 'unknown')} field={data.get('field', 'unknown')}")
+            app.logger.error(traceback.format_exc())
             
-            # Use safe printing to avoid console encoding issues
-            try:
-                print(f"Error updating content: {error_msg}", flush=True)
-            except:
-                pass  # Skip printing if it causes encoding issues
-            
-            # Return a simple error message without including the actual exception
-            response = jsonify({'message': 'Failed to update content. Please check if the content contains special characters.'})
-            response.headers['Content-Type'] = 'application/json; charset=utf-8'
-            return response, 500
+            return jsonify({'message': 'Failed to update content'}), 500
 
     @app.route('/api/content', methods=['GET'])
     def get_content():

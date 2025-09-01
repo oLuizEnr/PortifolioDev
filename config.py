@@ -46,13 +46,15 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db'
     SESSION_COOKIE_SECURE = False
     
-    # SQLite specific engine options
+    # SQLite specific engine options with UTF-8 support
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
         'echo': False,
         'connect_args': {
-            'check_same_thread': False
+            'check_same_thread': False,
+            'charset': 'utf8mb4',
+            'use_unicode': True
         } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {}
     }
 
@@ -68,13 +70,15 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
     
-    # Database specific engine options
+    # Database specific engine options with UTF-8 support
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
         'echo': False,
         'connect_args': {
-            'check_same_thread': False
+            'check_same_thread': False,
+            'charset': 'utf8mb4',
+            'use_unicode': True
         } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db') else {}
     }
 
