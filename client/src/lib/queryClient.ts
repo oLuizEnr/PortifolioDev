@@ -14,7 +14,10 @@ export async function apiRequest(
 ): Promise<Response> {
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: data ? { 
+      "Content-Type": "application/json; charset=utf-8",
+      "Accept": "application/json; charset=utf-8"
+    } : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });

@@ -15,13 +15,26 @@ import json
 
 # Force UTF-8 encoding for the entire environment
 os.environ['PYTHONIOENCODING'] = 'utf-8'
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+os.environ['LANG'] = 'en_US.UTF-8'
+os.environ['LC_ALL'] = 'en_US.UTF-8'
+
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+except:
+    try:
+        locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+    except:
+        pass
 
 # Force UTF-8 encoding for stdout/stderr
 if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 if hasattr(sys.stderr, 'reconfigure'):
-    sys.stderr.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
+# Override default string encoding
+sys.stdout = sys.stdout
+sys.stderr = sys.stderr
 
 def create_app(config_name=None):
     """Application factory pattern"""
@@ -375,7 +388,7 @@ def register_routes(app):
             
             # Parse JSON with proper UTF-8 handling
             try:
-                data = json.loads(raw_data.encode('utf-8').decode('utf-8'))
+                data = json.loads(raw_data)
             except:
                 data = request.get_json(force=True)
                 
@@ -386,10 +399,14 @@ def register_routes(app):
             if not all([section, field, content]):
                 return jsonify({'message': 'Section, field and content are required'}), 400
             
-            # Ensure all text data is properly handled as UTF-8
-            section = str(section).strip()
-            field = str(field).strip()
-            content = str(content).strip()
+            # Ensure all text data is properly handled as UTF-8 strings
+            section = str(section).strip() if section else ''
+            field = str(field).strip() if field else ''
+            content = str(content).strip() if content else ''
+            
+            # Validate that content is not empty after stripping
+            if not content:
+                return jsonify({'message': 'Content cannot be empty'}), 400
             
             # Check if content record exists
             existing_content = Content.query.filter_by(section=section, field=field).first()
@@ -406,14 +423,20 @@ def register_routes(app):
             
         except Exception as e:
             db.session.rollback()
-            # Handle UTF-8 encoding in error messages
+            # Handle UTF-8 encoding in error messages with safe handling
             try:
-                error_msg = str(e).encode('utf-8').decode('utf-8')
+                error_msg = repr(e)  # Use repr instead of str to avoid encoding issues
             except:
-                error_msg = "Encoding error occurred"
-            print(f"Error updating content: {error_msg}")
-            # Ensure we return UTF-8 encoded JSON
-            response = jsonify({'message': f'Failed to update content: {error_msg}'})
+                error_msg = "Database error occurred"
+            
+            # Use safe printing to avoid console encoding issues
+            try:
+                print(f"Error updating content: {error_msg}", flush=True)
+            except:
+                pass  # Skip printing if it causes encoding issues
+            
+            # Return a simple error message without including the actual exception
+            response = jsonify({'message': 'Failed to update content. Please check if the content contains special characters.'})
             response.headers['Content-Type'] = 'application/json; charset=utf-8'
             return response, 500
 

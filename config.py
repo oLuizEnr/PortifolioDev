@@ -16,6 +16,7 @@ class Config:
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
+        'echo': False,  # Disable SQL logging to avoid encoding issues
     }
     
     # Session configuration
@@ -49,7 +50,10 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'connect_args': {'check_same_thread': False} if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {}
+        'echo': False,
+        'connect_args': {
+            'check_same_thread': False
+        } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {}
     }
 
 class ProductionConfig(Config):
@@ -68,7 +72,10 @@ class ProductionConfig(Config):
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'connect_args': {'check_same_thread': False} if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db') else {}
+        'echo': False,
+        'connect_args': {
+            'check_same_thread': False
+        } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db') else {}
     }
 
 class PythonAnywhereConfig(ProductionConfig):

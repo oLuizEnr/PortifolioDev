@@ -1,0 +1,47 @@
+Erro ao salvar: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe1' in position 2: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe1' in position 2: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Erro ao salvar: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode characters in position 57-58: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode characters in position 57-58: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Erro ao salvar: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe7' in position 5: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe7' in position 5: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Erro ao salvar: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xea' in position 60: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xea' in position 60: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Erro ao salvar: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe1' in position 13: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xe1' in position 13: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+Erro ao salvar estatísticas: 
+Error {}
+message: "500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xea' in position 38: ordinal not in range(128)"↵}↵"
+stack: "Error: 500: {↵ "message": "Failed to update content: 'ascii' codec can't encode character '\\xea' in position 38: ordinal not in range(128)"↵}↵↵ at Cg (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42683)↵ at async Ve (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:48:42884)↵ at async Object.mutationFn (https://69989bd6-1b6b-4c25-99d6-a6c241884c51-00-39wz4l4c7tjqt.kirk.replit.dev/assets/index-b_AcFglw.js:288:68533)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
