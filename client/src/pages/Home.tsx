@@ -52,9 +52,17 @@ export default function Home() {
       
       <HeroSection />
       <AboutSection />
-      <ProjectsSection onOpenComments={openComments} />
-      <ExperienceSection />
-      <AchievementsSection onOpenComments={openComments} />
+      <ProjectsSection 
+        onOpenComments={openComments}
+        onOpenProjectModal={() => openProjectModal()}
+      />
+      <ExperienceSection 
+        onOpenExperienceModal={() => openExperienceModal()}
+      />
+      <AchievementsSection 
+        onOpenComments={openComments}
+        onOpenAchievementModal={() => openAchievementModal()}
+      />
       
       {/* Recent Comments Section */}
       <section className="py-20 bg-white">

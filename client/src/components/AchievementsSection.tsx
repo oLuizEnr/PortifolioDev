@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Share2, Trophy, Award, GraduationCap, Medal, CalendarDays, Eye } from "lucide-react";
+import { Heart, Share2, Trophy, Award, GraduationCap, Medal, CalendarDays, Eye, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -11,6 +11,7 @@ import type { Achievement } from "@shared/schema";
 
 interface AchievementsSectionProps {
   onOpenComments: (type: string, id: string) => void;
+  onOpenAchievementModal?: () => void;
 }
 
 const getIconForType = (type: string) => {
@@ -39,7 +40,7 @@ const getColorForType = (type: string) => {
   }
 };
 
-export default function AchievementsSection({ onOpenComments }: AchievementsSectionProps) {
+export default function AchievementsSection({ onOpenComments, onOpenAchievementModal }: AchievementsSectionProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -148,9 +149,21 @@ export default function AchievementsSection({ onOpenComments }: AchievementsSect
     <section id="achievements" className="py-20 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4" data-testid="text-achievements-title">
-            Conquistas & Certificações
-          </h2>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800" data-testid="text-achievements-title">
+              Conquistas & Certificações
+            </h2>
+            {user && (user as any)?.isAdmin && onOpenAchievementModal && (
+              <Button
+                onClick={onOpenAchievementModal}
+                className="bg-primary hover:bg-primary/90"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Conquista
+              </Button>
+            )}
+          </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Reconhecimentos e certificações que marcaram minha carreira
           </p>

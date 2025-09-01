@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Share2, Github, ExternalLink, Eye } from "lucide-react";
+import { Heart, MessageCircle, Share2, Github, ExternalLink, Eye, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -12,9 +12,10 @@ import type { Project } from "@shared/schema";
 
 interface ProjectsSectionProps {
   onOpenComments: (type: string, id: string) => void;
+  onOpenProjectModal?: () => void;
 }
 
-export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps) {
+export default function ProjectsSection({ onOpenComments, onOpenProjectModal }: ProjectsSectionProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -114,9 +115,21 @@ export default function ProjectsSection({ onOpenComments }: ProjectsSectionProps
     <section id="projects" className="py-20 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4" data-testid="text-projects-title">
-            Projetos em Destaque
-          </h2>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800" data-testid="text-projects-title">
+              Projetos em Destaque
+            </h2>
+            {user && (user as any)?.isAdmin && onOpenProjectModal && (
+              <Button
+                onClick={onOpenProjectModal}
+                className="bg-primary hover:bg-primary/90"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Projeto
+              </Button>
+            )}
+          </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Alguns dos meus trabalhos mais recentes e impactantes
           </p>

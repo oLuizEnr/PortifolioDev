@@ -2,12 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Eye } from "lucide-react";
+import { CalendarDays, Eye, Plus } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import type { Experience } from "@shared/schema";
 
-export default function ExperienceSection() {
+interface ExperienceSectionProps {
+  onOpenExperienceModal?: () => void;
+}
+
+export default function ExperienceSection({ onOpenExperienceModal }: ExperienceSectionProps) {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   
   const { data: experiences = [], isLoading } = useQuery<Experience[]>({
     queryKey: ["/api/experiences"],
@@ -45,9 +51,21 @@ export default function ExperienceSection() {
     <section id="experience" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-4" data-testid="text-experience-title">
-            Experiência Profissional
-          </h2>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800" data-testid="text-experience-title">
+              Experiência Profissional
+            </h2>
+            {user && (user as any)?.isAdmin && onOpenExperienceModal && (
+              <Button
+                onClick={onOpenExperienceModal}
+                className="bg-primary hover:bg-primary/90"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Experiência
+              </Button>
+            )}
+          </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Minha trajetória profissional no desenvolvimento de software
           </p>
