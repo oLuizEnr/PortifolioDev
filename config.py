@@ -46,16 +46,18 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db'
     SESSION_COOKIE_SECURE = False
     
-    # SQLite specific engine options with UTF-8 support
+    # Database engine options with proper UTF-8 support
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
         'echo': False,
+        'client_encoding': 'utf8',
         'connect_args': {
             'check_same_thread': False,
-            'charset': 'utf8mb4',
-            'use_unicode': True
-        } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {}
+            'options': '-c timezone=UTC'
+        } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {
+            'options': '-c client_encoding=UTF8'
+        }
     }
 
 class ProductionConfig(Config):
@@ -64,7 +66,7 @@ class ProductionConfig(Config):
     
     # For PythonAnywhere, you might want to use a different database path
     # or MySQL database
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db?charset=utf8'
     
     # Enable secure cookies in production
     SESSION_COOKIE_SECURE = True
@@ -77,9 +79,7 @@ class ProductionConfig(Config):
         'echo': False,
         'connect_args': {
             'check_same_thread': False,
-            'charset': 'utf8mb4',
-            'use_unicode': True
-        } if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db') else {}
+        }
     }
 
 class PythonAnywhereConfig(ProductionConfig):

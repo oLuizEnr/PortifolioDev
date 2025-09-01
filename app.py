@@ -66,6 +66,28 @@ def create_app(config_name=None):
     
     # Initialize database and create admin user
     with app.app_context():
+        # Ensure proper encoding for database
+        if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+            # PostgreSQL should use UTF-8 by default, set connection encoding
+            try:
+                from sqlalchemy import text
+                with db.engine.connect() as conn:
+                    conn.execute(text("SET client_encoding TO 'UTF8'"))
+                    conn.commit()
+                print("PostgreSQL encoding set to UTF-8")
+            except Exception as e:
+                print(f"Database encoding setup: {e}")
+        elif 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+            # For SQLite, ensure UTF-8 encoding
+            try:
+                from sqlalchemy import text
+                with db.engine.connect() as conn:
+                    conn.execute(text('PRAGMA encoding = "UTF-8"'))
+                    conn.commit()
+                print("SQLite encoding set to UTF-8")
+            except Exception as e:
+                print(f"SQLite encoding setup: {e}")
+        
         db.create_all()
         
         # Create default admin user if none exists
