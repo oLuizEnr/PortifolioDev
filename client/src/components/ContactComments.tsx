@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MessageCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 
 interface Comment {
   id: string;
@@ -22,7 +22,7 @@ interface ContactCommentsProps {
 }
 
 export default function ContactComments({ limit = 5, showHeader = true }: ContactCommentsProps) {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
     queryKey: ['/api/contact/comments', { limit }],
@@ -163,7 +163,7 @@ export default function ContactComments({ limit = 5, showHeader = true }: Contac
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/comments')}
+              onClick={() => setLocation('/comments')}
               data-testid="button-view-all-comments"
             >
               <Eye className="w-4 h-4 mr-2" />

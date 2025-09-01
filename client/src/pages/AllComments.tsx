@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MessageCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 
 interface Comment {
   id: string;
@@ -17,7 +17,7 @@ interface Comment {
 }
 
 export default function AllComments() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
     queryKey: ['/api/contact/comments/all'],
@@ -58,7 +58,7 @@ export default function AllComments() {
           <div className="mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate('/')}
+              onClick={() => setLocation('/')}
               className="mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -98,7 +98,7 @@ export default function AllComments() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate('/')}
+            onClick={() => setLocation('/')}
             className="mb-4"
             data-testid="button-back-home"
           >
@@ -125,7 +125,7 @@ export default function AllComments() {
                 Quando alguém enviar uma mensagem pelo formulário de contato, ela aparecerá aqui.
               </p>
               <Button 
-                onClick={() => navigate('/#contact')}
+                onClick={() => setLocation('/#contact')}
                 data-testid="button-go-to-contact"
               >
                 Ir para Contato
