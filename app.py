@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
 from flask_session import Session
@@ -9,6 +10,11 @@ from datetime import datetime, timedelta
 import uuid
 from typing import Optional, List
 import json
+
+# Force UTF-8 encoding
+if hasattr(sys, '_getframe'):
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
 
 def create_app(config_name=None):
     """Application factory pattern"""
@@ -22,10 +28,20 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     
+    # Force UTF-8 for JSON
+    app.config['JSON_AS_ASCII'] = False
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    
     # Initialize extensions
     db.init_app(app)
     Session(app)
     CORS(app, supports_credentials=True)
+    
+    # Add UTF-8 headers to all responses
+    @app.after_request
+    def after_request(response):
+        response.headers['Content-Type'] = 'application/json; charset=utf-8' if response.is_json else response.headers.get('Content-Type', 'text/html; charset=utf-8')
+        return response
     
     # Initialize database and create admin user
     with app.app_context():
@@ -370,8 +386,12 @@ def register_routes(app):
             
         except Exception as e:
             db.session.rollback()
-            print(f"Error updating content: {str(e)}")
-            return jsonify({'message': f'Failed to update content: {str(e)}'}), 500
+            error_msg = str(e)
+            print(f"Error updating content: {error_msg}")
+            # Ensure we return UTF-8 encoded JSON
+            response = jsonify({'message': f'Failed to update content: {error_msg}'})
+            response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            return response, 500
 
     @app.route('/api/content', methods=['GET'])
     def get_content():

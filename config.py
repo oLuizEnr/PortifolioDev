@@ -7,8 +7,16 @@ class Config:
     # Basic Flask config
     SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production-123456789')
     
+    # Encoding configuration
+    JSON_AS_ASCII = False
+    JSONIFY_PRETTYPRINT_REGULAR = True
+    
     # Database configuration
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
     
     # Session configuration
     SESSION_TYPE = 'filesystem'
@@ -36,6 +44,13 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db'
     SESSION_COOKIE_SECURE = False
+    
+    # SQLite specific engine options
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {'check_same_thread': False} if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio_dev.db') else {}
+    }
 
 class ProductionConfig(Config):
     """Production configuration for PythonAnywhere"""
@@ -48,6 +63,13 @@ class ProductionConfig(Config):
     # Enable secure cookies in production
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
+    
+    # Database specific engine options
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {'check_same_thread': False} if 'sqlite' in (os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db') else {}
+    }
 
 class PythonAnywhereConfig(ProductionConfig):
     """Specific configuration for PythonAnywhere deployment"""
